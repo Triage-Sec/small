@@ -9,6 +9,7 @@ from .dictionary import build_body_tokens, build_dictionary_tokens
 from .ast_python import discover_ast_candidates
 from .domain import detect_domain
 from .discovery import discover_candidates
+from .fuzzy import discover_fuzzy_candidates
 from .swap import perform_swaps
 from .static_dicts import (
     DOMAIN_TO_STATIC_ID,
@@ -17,7 +18,12 @@ from .static_dicts import (
     static_dictionary_marker,
 )
 from .types import CompressionResult, Token, TokenSeq
-from .utils import is_meta_token, parse_length_token, require_no_reserved_tokens
+from .utils import (
+    is_meta_token,
+    parse_length_token,
+    parse_patch_index_token,
+    require_no_reserved_tokens,
+)
 
 
 def _apply_static_dictionary(
@@ -39,7 +45,7 @@ def _apply_static_dictionary(
                 idx += 1
                 continue
             if tuple(tokens[idx : idx + len(subseq)]) == subseq:
-                replacements[idx] = (len(subseq), meta)
+                replacements[idx] = (len(subseq), meta, ())
                 for pos in range(idx, idx + len(subseq)):
                     occupied[pos] = True
                 idx += len(subseq)
@@ -47,7 +53,7 @@ def _apply_static_dictionary(
                 idx += 1
     if not replacements:
         return tokens, replacements
-    return build_body_tokens(tokens, replacements), replacements
+    return build_body_tokens(tokens, replacements, config), replacements
 
 
 def _select_static_dictionary(tokens: list[Token], config: CompressionConfig) -> str | None:
@@ -84,7 +90,9 @@ def _compress_internal(
     depth_limit = cfg.hierarchical_max_depth if cfg.hierarchical_enabled else 1
 
     for _ in range(depth_limit):
-        candidates = discover_candidates(working_tokens, cfg.max_subsequence_length)
+        candidates = discover_candidates(working_tokens, cfg.max_subsequence_length, cfg)
+        if cfg.fuzzy_enabled:
+            candidates = discover_fuzzy_candidates(working_tokens, cfg) + candidates
         if preferred_candidates:
             candidates = preferred_candidates + candidates
         if not candidates:
@@ -93,7 +101,7 @@ def _compress_internal(
         if not swap_result.dictionary_map:
             break
         dictionary_map.update(swap_result.dictionary_map)
-        working_tokens = build_body_tokens(working_tokens, swap_result.replacements)
+        working_tokens = build_body_tokens(working_tokens, swap_result.replacements, cfg)
         if not cfg.hierarchical_enabled:
             break
 
@@ -222,6 +230,33 @@ def decompress(tokens: Sequence[Token], config: CompressionConfig | None = None)
 
     decoded: list[Token] = []
     memo: dict[Token, list[Token]] = {}
-    for token in body_tokens:
-        decoded.extend(_expand_token(token, dictionary_map, cfg, memo))
+    idx = 0
+    while idx < len(body_tokens):
+        token = body_tokens[idx]
+        if token in dictionary_map:
+            if idx + 1 < len(body_tokens) and body_tokens[idx + 1] == cfg.patch_start_token:
+                idx += 2
+                patches: list[tuple[int, Token]] = []
+                while idx < len(body_tokens) and body_tokens[idx] != cfg.patch_end_token:
+                    patch_index = parse_patch_index_token(body_tokens[idx], cfg)
+                    if idx + 1 >= len(body_tokens):
+                        raise ValueError("Patch entry missing replacement token.")
+                    patch_value = body_tokens[idx + 1]
+                    patches.append((patch_index, patch_value))
+                    idx += 2
+                if idx >= len(body_tokens) or body_tokens[idx] != cfg.patch_end_token:
+                    raise ValueError("Patch section missing end delimiter.")
+                idx += 1
+                expanded = list(_expand_token(token, dictionary_map, cfg, memo))
+                for patch_index, patch_value in patches:
+                    if patch_index < 0 or patch_index >= len(expanded):
+                        raise ValueError("Patch index out of bounds.")
+                    expanded[patch_index] = patch_value
+                decoded.extend(expanded)
+                continue
+            decoded.extend(_expand_token(token, dictionary_map, cfg, memo))
+            idx += 1
+            continue
+        decoded.append(token)
+        idx += 1
     return decoded

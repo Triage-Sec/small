@@ -149,3 +149,23 @@ def test_decompress_with_static_dictionary_marker():
     ]
     restored = decompress(tokens, cfg)
     assert restored == ["def", "evaluate(self,"]
+
+
+def test_decompress_with_patch_section():
+    cfg = CompressionConfig()
+    tokens = [
+        cfg.dict_start_token,
+        "<MT_1>",
+        "<Len:3>",
+        "a",
+        "b",
+        "c",
+        cfg.dict_end_token,
+        "<MT_1>",
+        cfg.patch_start_token,
+        "<Idx:1>",
+        "x",
+        cfg.patch_end_token,
+    ]
+    restored = decompress(tokens, cfg)
+    assert restored == ["a", "x", "c"]

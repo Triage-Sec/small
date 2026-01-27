@@ -2,11 +2,12 @@
 
 from __future__ import annotations
 
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from typing import Hashable, Iterable, Sequence
 
 Token = Hashable
 TokenSeq = Sequence[Token]
+Patch = tuple[int, Token]
 
 
 @dataclass(frozen=True)
@@ -15,6 +16,7 @@ class Candidate:
     length: int
     positions: tuple[int, ...]
     priority: int = 0
+    patches: dict[int, tuple[Patch, ...]] = field(default_factory=dict)
 
 
 @dataclass(frozen=True)
@@ -23,6 +25,7 @@ class Occurrence:
     length: int
     subsequence: tuple[Token, ...]
     priority: int = 0
+    patches: tuple[Patch, ...] = ()
 
 
 @dataclass(frozen=True)

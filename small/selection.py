@@ -25,6 +25,7 @@ def _build_occurrences(candidates: Iterable[Candidate]) -> list[Occurrence]:
                     length=candidate.length,
                     subsequence=candidate.subsequence,
                     priority=candidate.priority,
+                    patches=candidate.patches.get(pos, ()),
                 )
             )
     occurrences.sort(key=lambda occ: (occ.start + occ.length, occ.start))
@@ -48,11 +49,12 @@ def _group_by_subsequence(occurrences: list[Occurrence]) -> dict[tuple, list[Occ
     return grouped
 
 
-def _filter_by_compressibility(occurrences: list[Occurrence]) -> list[Occurrence]:
+def _filter_by_compressibility(occurrences: list[Occurrence], config: CompressionConfig) -> list[Occurrence]:
     grouped = _group_by_subsequence(occurrences)
     filtered: list[Occurrence] = []
     for subseq, occs in grouped.items():
-        if is_compressible(len(subseq), len(occs)):
+        extra_cost = 1 if config.dict_length_enabled else 0
+        if is_compressible(len(subseq), len(occs), extra_cost=extra_cost):
             filtered.extend(occs)
     filtered.sort(key=lambda occ: occ.start)
     return filtered
@@ -140,5 +142,5 @@ def select_occurrences(candidates: Iterable[Candidate], config: CompressionConfi
     else:
         raise ValueError("Unsupported selection mode.")
 
-    selected = _filter_by_compressibility(selected)
+    selected = _filter_by_compressibility(selected, config)
     return SelectionResult(selected=selected)

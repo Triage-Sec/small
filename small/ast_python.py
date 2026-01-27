@@ -131,7 +131,8 @@ def discover_ast_candidates(source: str, config: CompressionConfig) -> tuple[lis
             if pos >= next_free:
                 non_overlapping.append(pos)
                 next_free = pos + len(subseq)
-        if is_compressible(len(subseq), len(non_overlapping)):
+        extra_cost = 1 if config.dict_length_enabled else 0
+        if is_compressible(len(subseq), len(non_overlapping), extra_cost=extra_cost):
             result.append(
                 Candidate(
                     subsequence=subseq,

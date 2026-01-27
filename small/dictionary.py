@@ -6,7 +6,7 @@ from typing import Iterable
 
 from .config import CompressionConfig
 from .types import Token, TokenSeq
-from .utils import is_meta_token, length_token
+from .utils import is_meta_token, length_token, patch_index_token
 
 
 def order_dictionary_entries(
@@ -50,7 +50,11 @@ def build_dictionary_tokens(dictionary_map: dict[Token, tuple[Token, ...]], conf
     return tokens
 
 
-def build_body_tokens(tokens: TokenSeq, replacements: dict[int, tuple[int, Token]]) -> list[Token]:
+def build_body_tokens(
+    tokens: TokenSeq,
+    replacements: dict[int, tuple[int, Token, tuple]],
+    config: CompressionConfig,
+) -> list[Token]:
     body: list[Token] = []
     idx = 0
     n = len(tokens)
@@ -60,7 +64,13 @@ def build_body_tokens(tokens: TokenSeq, replacements: dict[int, tuple[int, Token
             body.append(tokens[idx])
             idx += 1
             continue
-        length, meta_token = replacement
+        length, meta_token, patches = replacement
         body.append(meta_token)
+        if patches:
+            body.append(config.patch_start_token)
+            for patch_idx, patch_token in patches:
+                body.append(patch_index_token(patch_idx, config))
+                body.append(patch_token)
+            body.append(config.patch_end_token)
         idx += length
     return body

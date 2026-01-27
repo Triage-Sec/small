@@ -5,6 +5,7 @@ from __future__ import annotations
 from collections import defaultdict
 from typing import Iterable
 
+from .config import CompressionConfig
 from .types import Candidate, Token, TokenSeq
 from .utils import is_compressible
 
@@ -19,11 +20,12 @@ def _non_overlapping_positions(positions: Iterable[int], length: int) -> tuple[i
     return tuple(selected)
 
 
-def discover_candidates(tokens: TokenSeq, max_length: int) -> list[Candidate]:
+def discover_candidates(tokens: TokenSeq, max_length: int, config: CompressionConfig | None = None) -> list[Candidate]:
     if max_length < 2:
         return []
     n = len(tokens)
     candidates: list[Candidate] = []
+    extra_cost = 1 if config and config.dict_length_enabled else 0
 
     for length in range(max_length, 1, -1):
         if length > n:
@@ -37,7 +39,7 @@ def discover_candidates(tokens: TokenSeq, max_length: int) -> list[Candidate]:
         for subseq, positions in positions_by_subseq.items():
             non_overlapping = _non_overlapping_positions(positions, length)
             count = len(non_overlapping)
-            if is_compressible(length, count):
+            if is_compressible(length, count, extra_cost=extra_cost):
                 candidates.append(
                     Candidate(
                         subsequence=subseq,

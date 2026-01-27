@@ -29,5 +29,12 @@ class CompressionConfig:
     static_dictionary_marker_prefix: str = "<StaticDict:"
     static_dictionary_marker_suffix: str = ">"
     static_dictionary_min_length: int = 2
+    fuzzy_enabled: bool = False
+    fuzzy_max_diff: int = 1
+    fuzzy_priority_bonus: int = 1
+    patch_start_token: str = "<Patch>"
+    patch_end_token: str = "</Patch>"
+    patch_index_prefix: str = "<Idx:"
+    patch_index_suffix: str = ">"
     rng_seed: Optional[int] = None
     verify: bool = False
