@@ -34,3 +34,4 @@ class CompressionResult:
     meta_tokens_used: tuple[Token, ...]
     original_length: int
     compressed_length: int
+    static_dictionary_id: str | None = None

@@ -7,10 +7,58 @@ from typing import Sequence
 from .config import CompressionConfig
 from .dictionary import build_body_tokens, build_dictionary_tokens
 from .ast_python import discover_ast_candidates
+from .domain import detect_domain
 from .discovery import discover_candidates
 from .swap import perform_swaps
+from .static_dicts import (
+    DOMAIN_TO_STATIC_ID,
+    get_static_dictionary,
+    parse_static_dictionary_marker,
+    static_dictionary_marker,
+)
 from .types import CompressionResult, Token, TokenSeq
 from .utils import is_meta_token, parse_length_token, require_no_reserved_tokens
+
+
+def _apply_static_dictionary(
+    tokens: list[Token],
+    static_dict: dict[Token, tuple[Token, ...]],
+    config: CompressionConfig,
+) -> tuple[list[Token], dict[int, tuple[int, Token]]]:
+    if any(token in static_dict for token in tokens):
+        raise ValueError("Input sequence contains static meta-tokens.")
+    occupied = [False] * len(tokens)
+    replacements: dict[int, tuple[int, Token]] = {}
+    entries = sorted(static_dict.items(), key=lambda item: len(item[1]), reverse=True)
+    for meta, subseq in entries:
+        if len(subseq) < config.static_dictionary_min_length:
+            continue
+        idx = 0
+        while idx <= len(tokens) - len(subseq):
+            if any(occupied[idx : idx + len(subseq)]):
+                idx += 1
+                continue
+            if tuple(tokens[idx : idx + len(subseq)]) == subseq:
+                replacements[idx] = (len(subseq), meta)
+                for pos in range(idx, idx + len(subseq)):
+                    occupied[pos] = True
+                idx += len(subseq)
+            else:
+                idx += 1
+    if not replacements:
+        return tokens, replacements
+    return build_body_tokens(tokens, replacements), replacements
+
+
+def _select_static_dictionary(tokens: list[Token], config: CompressionConfig) -> str | None:
+    if config.static_dictionary_id:
+        return config.static_dictionary_id
+    if not config.static_dictionary_auto:
+        return None
+    detection = detect_domain(tokens, config)
+    if detection.domain is None or detection.confidence < config.static_dictionary_min_confidence:
+        return None
+    return DOMAIN_TO_STATIC_ID.get(detection.domain)
 
 
 def _compress_internal(
@@ -22,6 +70,16 @@ def _compress_internal(
     require_no_reserved_tokens(tokens, cfg)
 
     working_tokens = list(tokens)
+    static_id = _select_static_dictionary(working_tokens, cfg)
+    static_dict = None
+    static_replacements: dict[int, tuple[int, Token]] = {}
+    if static_id:
+        static_entry = get_static_dictionary(static_id)
+        if static_entry is None:
+            raise ValueError("Unknown static dictionary id.")
+        static_dict = static_entry.entries
+        working_tokens, static_replacements = _apply_static_dictionary(working_tokens, static_dict, cfg)
+
     dictionary_map: dict[Token, tuple[Token, ...]] = {}
     depth_limit = cfg.hierarchical_max_depth if cfg.hierarchical_enabled else 1
 
@@ -41,7 +99,11 @@ def _compress_internal(
 
     dictionary_tokens = build_dictionary_tokens(dictionary_map, cfg)
     body_tokens = working_tokens
-    compressed_tokens = dictionary_tokens + body_tokens
+    if static_id:
+        marker = static_dictionary_marker(static_id, cfg)
+        compressed_tokens = [marker] + dictionary_tokens + body_tokens
+    else:
+        compressed_tokens = dictionary_tokens + body_tokens
 
     result = CompressionResult(
         compressed_tokens=compressed_tokens,
@@ -51,6 +113,7 @@ def _compress_internal(
         meta_tokens_used=tuple(dictionary_map.keys()),
         original_length=len(tokens),
         compressed_length=len(compressed_tokens),
+        static_dictionary_id=static_id,
     )
 
     if cfg.verify:
@@ -94,15 +157,24 @@ def decompress(tokens: Sequence[Token], config: CompressionConfig | None = None)
     cfg = config or CompressionConfig()
     if not tokens:
         return []
-    if tokens[0] != cfg.dict_start_token:
+    idx = 0
+    static_dict: dict[Token, tuple[Token, ...]] = {}
+    static_id = parse_static_dictionary_marker(tokens[0], cfg)
+    if static_id:
+        entry = get_static_dictionary(static_id)
+        if entry is None:
+            raise ValueError("Unknown static dictionary id.")
+        static_dict = dict(entry.entries)
+        idx = 1
+    if idx >= len(tokens) or tokens[idx] != cfg.dict_start_token:
         raise ValueError("Compressed sequence does not start with dictionary delimiter.")
 
     try:
-        end_idx = tokens.index(cfg.dict_end_token)
+        end_idx = tokens.index(cfg.dict_end_token, idx + 1)
     except ValueError as exc:
         raise ValueError("Compressed sequence missing dictionary end delimiter.") from exc
 
-    dict_tokens = tokens[1:end_idx]
+    dict_tokens = tokens[idx + 1 : end_idx]
     body_tokens = tokens[end_idx + 1 :]
 
     dictionary_map: dict[Token, list[Token]] = {}
@@ -142,6 +214,11 @@ def decompress(tokens: Sequence[Token], config: CompressionConfig | None = None)
     for meta, subseq in dictionary_map.items():
         if not subseq:
             raise ValueError("Empty dictionary entry for meta-token.")
+
+    for meta, subseq in static_dict.items():
+        if meta in dictionary_map:
+            raise ValueError("Static and dynamic dictionaries share a meta-token.")
+        dictionary_map[meta] = list(subseq)
 
     decoded: list[Token] = []
     memo: dict[Token, list[Token]] = {}

@@ -137,3 +137,15 @@ def test_compress_python_source_roundtrip():
     tokens, result = compress_python_source(source, cfg)
     restored = decompress(result.compressed_tokens, cfg)
     assert restored == tokens
+
+
+def test_decompress_with_static_dictionary_marker():
+    cfg = CompressionConfig()
+    tokens = [
+        "<StaticDict:policy-python-v1>",
+        cfg.dict_start_token,
+        cfg.dict_end_token,
+        "<SD_0>",
+    ]
+    restored = decompress(tokens, cfg)
+    assert restored == ["def", "evaluate(self,"]

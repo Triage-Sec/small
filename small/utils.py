@@ -41,6 +41,11 @@ def require_no_reserved_tokens(tokens: Sequence[Token], config: CompressionConfi
         if config.dict_length_enabled and isinstance(token, str):
             if token.startswith(config.dict_length_prefix) and token.endswith(config.dict_length_suffix):
                 raise ValueError("Dictionary length token appears in input sequence.")
+        if isinstance(token, str):
+            if token.startswith(config.static_dictionary_marker_prefix) and token.endswith(
+                config.static_dictionary_marker_suffix
+            ):
+                raise ValueError("Static dictionary marker appears in input sequence.")
 
 
 def length_token(length: int, config: CompressionConfig) -> Token:

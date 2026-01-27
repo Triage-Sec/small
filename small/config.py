@@ -23,5 +23,11 @@ class CompressionConfig:
     beam_width: int = 8
     ast_enabled: bool = True
     ast_priority_bonus: int = 2
+    static_dictionary_id: Optional[str] = None
+    static_dictionary_auto: bool = True
+    static_dictionary_min_confidence: float = 0.85
+    static_dictionary_marker_prefix: str = "<StaticDict:"
+    static_dictionary_marker_suffix: str = ">"
+    static_dictionary_min_length: int = 2
     rng_seed: Optional[int] = None
     verify: bool = False
