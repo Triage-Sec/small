@@ -38,5 +38,9 @@ class CompressionConfig:
     patch_index_prefix: str = "<Idx:"
     patch_index_suffix: str = ">"
     metrics_enabled: bool = True
+    discovery_mode: str = "suffix-array"
+    parallel_discovery: bool = False
+    parallel_length_threshold: int = 20000
+    chunk_size: int = 200000
     rng_seed: Optional[int] = None
     verify: bool = False

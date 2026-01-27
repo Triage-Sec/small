@@ -33,4 +33,10 @@ def validate_config(config: CompressionConfig) -> list[ConfigWarning]:
         raise ValueError("Static dictionary min confidence must be between 0 and 1.")
     if config.fuzzy_max_diff < 0:
         raise ValueError("Fuzzy max diff must be >= 0.")
+    if config.discovery_mode not in {"suffix-array", "window"}:
+        raise ValueError("Discovery mode must be one of: suffix-array, window.")
+    if config.parallel_length_threshold < 0:
+        raise ValueError("Parallel length threshold must be >= 0.")
+    if config.chunk_size < 0:
+        raise ValueError("Chunk size must be >= 0.")
     return warnings

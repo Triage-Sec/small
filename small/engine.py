@@ -7,7 +7,8 @@ import warnings
 
 from .config import CompressionConfig
 from .dictionary import build_body_tokens
-from .discovery import discover_candidates
+from .discovery import discover_candidates, discover_candidates_chunked
+from .discovery_parallel import discover_candidates_parallel
 from .discovery_sa import discover_candidates_sa
 from .fuzzy import discover_fuzzy_candidates
 from .swap import perform_swaps
@@ -28,8 +29,12 @@ class ExactDiscoveryStage(DiscoveryStage):
     use_suffix_array: bool = True
 
     def discover(self, tokens: TokenSeq, config: CompressionConfig) -> list[Candidate]:
-        if self.use_suffix_array:
+        if self.use_suffix_array and config.discovery_mode == "suffix-array":
             return discover_candidates_sa(tokens, config)
+        if config.parallel_discovery and len(tokens) >= config.parallel_length_threshold:
+            return discover_candidates_parallel(tokens, config)
+        if config.chunk_size and len(tokens) >= config.chunk_size:
+            return discover_candidates_chunked(tokens, config)
         return discover_candidates(tokens, config.max_subsequence_length, config)
 
 
