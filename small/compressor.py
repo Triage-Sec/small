@@ -71,6 +71,9 @@ def decompress(tokens: Sequence[Token], config: CompressionConfig | None = None)
 
     if current_meta is None and dict_tokens:
         raise ValueError("Dictionary did not contain any meta-tokens.")
+    for meta, subseq in dictionary_map.items():
+        if not subseq:
+            raise ValueError("Empty dictionary entry for meta-token.")
 
     decoded: list[Token] = []
     for token in body_tokens:

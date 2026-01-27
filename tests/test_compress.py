@@ -73,3 +73,36 @@ def test_decompress_requires_meta_token_header():
         assert "Dictionary entry missing meta-token" in str(exc)
     else:
         raise AssertionError("Expected error for missing meta-token header.")
+
+
+def test_decompress_rejects_empty_dictionary_entry():
+    cfg = CompressionConfig()
+    tokens = [
+        cfg.dict_start_token,
+        "<MT_1>",
+        cfg.dict_end_token,
+        "x",
+    ]
+    try:
+        decompress(tokens, cfg)
+    except ValueError as exc:
+        assert "Empty dictionary entry" in str(exc)
+    else:
+        raise AssertionError("Expected error for empty dictionary entry.")
+
+
+def test_decompress_requires_end_delimiter():
+    cfg = CompressionConfig()
+    tokens = [
+        cfg.dict_start_token,
+        "<MT_1>",
+        "a",
+        "b",
+        "c",
+    ]
+    try:
+        decompress(tokens, cfg)
+    except ValueError as exc:
+        assert "missing dictionary end delimiter" in str(exc).lower()
+    else:
+        raise AssertionError("Expected error for missing dictionary end delimiter.")
