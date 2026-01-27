@@ -19,5 +19,7 @@ class CompressionConfig:
     dict_length_suffix: str = ">"
     hierarchical_enabled: bool = True
     hierarchical_max_depth: int = 3
+    selection_mode: str = "greedy"
+    beam_width: int = 8
     rng_seed: Optional[int] = None
     verify: bool = False

@@ -6,8 +6,9 @@ from dataclasses import dataclass
 from typing import Iterable
 
 from .config import CompressionConfig
-from .types import Candidate, Token, TokenSeq
-from .utils import generate_meta_token_pool, is_compressible
+from .selection import select_occurrences
+from .types import Candidate, Occurrence, Token, TokenSeq
+from .utils import generate_meta_token_pool
 
 
 @dataclass(frozen=True)
@@ -17,37 +18,26 @@ class SwapResult:
     meta_tokens_used: tuple[Token, ...]
 
 
-def _positions_available(occupied: list[bool], start: int, length: int) -> bool:
-    end = start + length
-    return not any(occupied[start:end])
-
-
 def perform_swaps(tokens: TokenSeq, candidates: Iterable[Candidate], config: CompressionConfig) -> SwapResult:
-    occupied = [False] * len(tokens)
     replacements: dict[int, tuple[int, Token]] = {}
     dictionary_map: dict[Token, tuple[Token, ...]] = {}
     meta_tokens: list[Token] = []
 
     pool = generate_meta_token_pool(config, tokens)
 
-    for candidate in candidates:
-        available = [
-            pos
-            for pos in candidate.positions
-            if _positions_available(occupied, pos, candidate.length)
-        ]
-        count = len(available)
-        if not is_compressible(candidate.length, count):
-            continue
+    selection = select_occurrences(candidates, config)
+    occurrences_by_subseq: dict[tuple[Token, ...], list[Occurrence]] = {}
+    for occ in selection.selected:
+        occurrences_by_subseq.setdefault(occ.subsequence, []).append(occ)
+
+    for subseq, occs in occurrences_by_subseq.items():
         if not pool:
             break
         meta = pool.pop()
-        dictionary_map[meta] = candidate.subsequence
+        dictionary_map[meta] = subseq
         meta_tokens.append(meta)
-        for pos in available:
-            for idx in range(pos, pos + candidate.length):
-                occupied[idx] = True
-            replacements[pos] = (candidate.length, meta)
+        for occ in occs:
+            replacements[occ.start] = (occ.length, meta)
 
     return SwapResult(
         replacements=replacements,

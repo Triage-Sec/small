@@ -17,6 +17,13 @@ class Candidate:
 
 
 @dataclass(frozen=True)
+class Occurrence:
+    start: int
+    length: int
+    subsequence: tuple[Token, ...]
+
+
+@dataclass(frozen=True)
 class CompressionResult:
     compressed_tokens: list[Token]
     dictionary_tokens: list[Token]
