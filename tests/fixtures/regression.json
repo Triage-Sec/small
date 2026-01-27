@@ -1,0 +1,12 @@
+[
+  {
+    "name": "repeated_ab",
+    "tokens": ["a", "b", "c", "d", "a", "b", "c", "d", "a", "b", "c", "d", "a", "b", "c", "d"],
+    "min_ratio": 0.85
+  },
+  {
+    "name": "no_repeats",
+    "tokens": ["x", "y", "z"],
+    "min_ratio": 1.0
+  }
+]
