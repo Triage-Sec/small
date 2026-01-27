@@ -16,13 +16,12 @@ class SuffixArray:
 
 def _rank_tokens(tokens: Iterable[Token]) -> list[int]:
     values = list(tokens)
-    mapping: dict[Token, int] = {}
-    ranked: list[int] = []
-    for value in values:
-        if value not in mapping:
-            mapping[value] = len(mapping) + 1
-        ranked.append(mapping[value])
-    return ranked
+    def sort_key(value: Token) -> tuple[str, str]:
+        return (type(value).__name__, repr(value))
+
+    unique = sorted(set(values), key=sort_key)
+    mapping = {value: idx + 1 for idx, value in enumerate(unique)}
+    return [mapping[value] for value in values]
 
 
 def build_suffix_array(tokens: Iterable[Token]) -> SuffixArray:
