@@ -21,5 +21,7 @@ class CompressionConfig:
     hierarchical_max_depth: int = 3
     selection_mode: str = "greedy"
     beam_width: int = 8
+    ast_enabled: bool = True
+    ast_priority_bonus: int = 2
     rng_seed: Optional[int] = None
     verify: bool = False

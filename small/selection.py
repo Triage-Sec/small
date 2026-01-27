@@ -20,7 +20,12 @@ def _build_occurrences(candidates: Iterable[Candidate]) -> list[Occurrence]:
     for candidate in candidates:
         for pos in candidate.positions:
             occurrences.append(
-                Occurrence(start=pos, length=candidate.length, subsequence=candidate.subsequence)
+                Occurrence(
+                    start=pos,
+                    length=candidate.length,
+                    subsequence=candidate.subsequence,
+                    priority=candidate.priority,
+                )
             )
     occurrences.sort(key=lambda occ: (occ.start + occ.length, occ.start))
     return occurrences
@@ -29,7 +34,7 @@ def _build_occurrences(candidates: Iterable[Candidate]) -> list[Occurrence]:
 def _non_overlapping(occurrences: list[Occurrence]) -> list[Occurrence]:
     selected: list[Occurrence] = []
     next_free = -1
-    for occ in sorted(occurrences, key=lambda occ: (occ.start, occ.length)):
+    for occ in sorted(occurrences, key=lambda occ: (-occ.priority, occ.start, occ.length)):
         if occ.start >= next_free:
             selected.append(occ)
             next_free = occ.start + occ.length
@@ -76,7 +81,7 @@ def _weighted_interval_scheduling(occurrences: list[Occurrence]) -> list[Occurre
         p.append(idx)
 
     # dp over occurrences
-    weights = [occ.length - 1 for occ in occs]
+    weights = [occ.length - 1 + occ.priority for occ in occs]
     dp = [0] * len(occs)
     choose = [False] * len(occs)
     for i in range(len(occs)):
@@ -116,7 +121,7 @@ def _beam_search(occurrences: list[Occurrence], width: int) -> list[Occurrence]:
             # take
             if occ.start >= last_end:
                 new_selected = selected + [occ]
-                new_states.append((score + (occ.length - 1), occ.start + occ.length, new_selected))
+                new_states.append((score + (occ.length - 1 + occ.priority), occ.start + occ.length, new_selected))
         # keep top-k by score, then by shortest last_end
         new_states.sort(key=lambda s: (s[0], -s[1]), reverse=True)
         states = new_states[: max(1, width)]

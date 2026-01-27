@@ -6,13 +6,18 @@ from typing import Sequence
 
 from .config import CompressionConfig
 from .dictionary import build_body_tokens, build_dictionary_tokens
+from .ast_python import discover_ast_candidates
 from .discovery import discover_candidates
 from .swap import perform_swaps
 from .types import CompressionResult, Token, TokenSeq
 from .utils import is_meta_token, parse_length_token, require_no_reserved_tokens
 
 
-def compress(tokens: TokenSeq, config: CompressionConfig | None = None) -> CompressionResult:
+def _compress_internal(
+    tokens: TokenSeq,
+    config: CompressionConfig,
+    preferred_candidates: list | None = None,
+) -> CompressionResult:
     cfg = config or CompressionConfig()
     require_no_reserved_tokens(tokens, cfg)
 
@@ -22,6 +27,8 @@ def compress(tokens: TokenSeq, config: CompressionConfig | None = None) -> Compr
 
     for _ in range(depth_limit):
         candidates = discover_candidates(working_tokens, cfg.max_subsequence_length)
+        if preferred_candidates:
+            candidates = preferred_candidates + candidates
         if not candidates:
             break
         swap_result = perform_swaps(working_tokens, candidates, cfg)
@@ -52,6 +59,18 @@ def compress(tokens: TokenSeq, config: CompressionConfig | None = None) -> Compr
             raise ValueError("Round-trip verification failed.")
 
     return result
+
+
+def compress(tokens: TokenSeq, config: CompressionConfig | None = None) -> CompressionResult:
+    cfg = config or CompressionConfig()
+    return _compress_internal(tokens, cfg, preferred_candidates=None)
+
+
+def compress_python_source(source: str, config: CompressionConfig | None = None) -> tuple[list[Token], CompressionResult]:
+    cfg = config or CompressionConfig()
+    tokens, ast_candidates = discover_ast_candidates(source, cfg) if cfg.ast_enabled else (source.split(), [])
+    result = _compress_internal(tokens, cfg, preferred_candidates=ast_candidates)
+    return tokens, result
 
 
 def _expand_token(

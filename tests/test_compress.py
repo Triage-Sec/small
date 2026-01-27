@@ -1,4 +1,4 @@
-from small import CompressionConfig, compress, decompress
+from small import CompressionConfig, compress, compress_python_source, decompress
 from small.utils import is_compressible
 
 
@@ -129,3 +129,11 @@ def test_decompress_hierarchical_dictionary():
     ]
     restored = decompress(tokens, cfg)
     assert restored == ["a", "b", "c"]
+
+
+def test_compress_python_source_roundtrip():
+    source = "def add(x, y):\n    return x + y\n"
+    cfg = CompressionConfig(verify=True)
+    tokens, result = compress_python_source(source, cfg)
+    restored = decompress(result.compressed_tokens, cfg)
+    assert restored == tokens

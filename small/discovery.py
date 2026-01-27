@@ -38,6 +38,13 @@ def discover_candidates(tokens: TokenSeq, max_length: int) -> list[Candidate]:
             non_overlapping = _non_overlapping_positions(positions, length)
             count = len(non_overlapping)
             if is_compressible(length, count):
-                candidates.append(Candidate(subsequence=subseq, length=length, positions=non_overlapping))
+                candidates.append(
+                    Candidate(
+                        subsequence=subseq,
+                        length=length,
+                        positions=non_overlapping,
+                        priority=0,
+                    )
+                )
 
     return candidates

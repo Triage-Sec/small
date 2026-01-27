@@ -14,6 +14,7 @@ class Candidate:
     subsequence: tuple[Token, ...]
     length: int
     positions: tuple[int, ...]
+    priority: int = 0
 
 
 @dataclass(frozen=True)
@@ -21,6 +22,7 @@ class Occurrence:
     start: int
     length: int
     subsequence: tuple[Token, ...]
+    priority: int = 0
 
 
 @dataclass(frozen=True)
