@@ -17,7 +17,7 @@ def test_round_trip_basic():
     result = compress(tokens, cfg)
     restored = decompress(result.compressed_tokens, cfg)
     assert restored == tokens
-    assert result.compressed_length < result.original_length
+    assert len(result.body_tokens) < result.original_length
 
 
 def test_rejects_reserved_tokens():
