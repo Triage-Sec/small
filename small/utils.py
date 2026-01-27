@@ -38,3 +38,23 @@ def require_no_reserved_tokens(tokens: Sequence[Token], config: CompressionConfi
     for token in tokens:
         if is_meta_token(token, config):
             raise ValueError("Input sequence contains a meta-token pattern.")
+        if config.dict_length_enabled and isinstance(token, str):
+            if token.startswith(config.dict_length_prefix) and token.endswith(config.dict_length_suffix):
+                raise ValueError("Dictionary length token appears in input sequence.")
+
+
+def length_token(length: int, config: CompressionConfig) -> Token:
+    if not config.dict_length_enabled:
+        raise ValueError("Length tokens are disabled.")
+    return f"{config.dict_length_prefix}{length}{config.dict_length_suffix}"
+
+
+def parse_length_token(token: Token, config: CompressionConfig) -> int:
+    if not isinstance(token, str):
+        raise ValueError("Length tokens must be strings.")
+    if not (token.startswith(config.dict_length_prefix) and token.endswith(config.dict_length_suffix)):
+        raise ValueError("Invalid dictionary length token.")
+    value = token[len(config.dict_length_prefix) : -len(config.dict_length_suffix)]
+    if not value.isdigit():
+        raise ValueError("Invalid dictionary length token value.")
+    return int(value)

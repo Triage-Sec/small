@@ -44,8 +44,10 @@ def test_decompress_rejects_duplicate_meta_tokens():
     tokens = [
         cfg.dict_start_token,
         "<MT_1>",
+        "<Len:1>",
         "a",
         "<MT_1>",
+        "<Len:1>",
         "b",
         cfg.dict_end_token,
         "<MT_1>",
@@ -80,6 +82,7 @@ def test_decompress_rejects_empty_dictionary_entry():
     tokens = [
         cfg.dict_start_token,
         "<MT_1>",
+        "<Len:0>",
         cfg.dict_end_token,
         "x",
     ]
@@ -96,6 +99,7 @@ def test_decompress_requires_end_delimiter():
     tokens = [
         cfg.dict_start_token,
         "<MT_1>",
+        "<Len:3>",
         "a",
         "b",
         "c",
@@ -106,3 +110,22 @@ def test_decompress_requires_end_delimiter():
         assert "missing dictionary end delimiter" in str(exc).lower()
     else:
         raise AssertionError("Expected error for missing dictionary end delimiter.")
+
+
+def test_decompress_hierarchical_dictionary():
+    cfg = CompressionConfig()
+    tokens = [
+        cfg.dict_start_token,
+        "<MT_1>",
+        "<Len:2>",
+        "a",
+        "b",
+        "<MT_2>",
+        "<Len:2>",
+        "<MT_1>",
+        "c",
+        cfg.dict_end_token,
+        "<MT_2>",
+    ]
+    restored = decompress(tokens, cfg)
+    assert restored == ["a", "b", "c"]

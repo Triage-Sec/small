@@ -14,5 +14,10 @@ class CompressionConfig:
     meta_token_pool_size: int = 512
     dict_start_token: str = "<Dict>"
     dict_end_token: str = "</Dict>"
+    dict_length_enabled: bool = True
+    dict_length_prefix: str = "<Len:"
+    dict_length_suffix: str = ">"
+    hierarchical_enabled: bool = True
+    hierarchical_max_depth: int = 3
     rng_seed: Optional[int] = None
     verify: bool = False
