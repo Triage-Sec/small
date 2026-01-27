@@ -19,3 +19,4 @@ Small operates on token sequences, not raw text. Tokens are represented as hasha
 - Use `compress_python_source` for Python source inputs to enable AST-aware discovery.
 - Select `selection_mode` to trade off speed vs. optimality.
 - Enable `fuzzy_enabled` only when patch encoding is acceptable.
+- Tokenizer adapters are available in `small.tokenizer`.

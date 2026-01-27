@@ -72,3 +72,4 @@ python benchmarks/length_compare.py --corpus benchmarks/data/structured_corpus.t
 - `docs/03-usage.md`
 - `docs/04-verification.md`
 - `docs/05-improvements.md`
+- `docs/06-architecture.md`
