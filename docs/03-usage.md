@@ -14,3 +14,4 @@ Small operates on token sequences, not raw text. Tokens are represented as hasha
 - Compression is lossless and reversible.
 - Configure the meta-token prefix and pool size to avoid collisions.
 - Use verification in development to catch regressions.
+- Ensure `<Dict>` and `</Dict>` do not appear in original tokens.

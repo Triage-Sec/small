@@ -26,3 +26,4 @@ BODY...
 - Meta-tokens are guaranteed not to appear in original input tokens.
 - Subsequence definitions do not contain meta-tokens.
 - Parsing relies on recognizing meta-token boundaries inside the dictionary.
+- Dictionary delimiters are reserved tokens and must not appear in the original input.

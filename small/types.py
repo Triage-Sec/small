@@ -1,0 +1,27 @@
+"""Shared types for the LTSC implementation."""
+
+from __future__ import annotations
+
+from dataclasses import dataclass
+from typing import Hashable, Iterable, Sequence
+
+Token = Hashable
+TokenSeq = Sequence[Token]
+
+
+@dataclass(frozen=True)
+class Candidate:
+    subsequence: tuple[Token, ...]
+    length: int
+    positions: tuple[int, ...]
+
+
+@dataclass(frozen=True)
+class CompressionResult:
+    compressed_tokens: list[Token]
+    dictionary_tokens: list[Token]
+    body_tokens: list[Token]
+    dictionary_map: dict[Token, tuple[Token, ...]]
+    meta_tokens_used: tuple[Token, ...]
+    original_length: int
+    compressed_length: int
