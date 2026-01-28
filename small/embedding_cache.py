@@ -71,6 +71,7 @@ class SQLiteEmbeddingCache:
         self.conn = sqlite3.connect(self.config.path)
         self.conn.execute("PRAGMA journal_mode=WAL;" if self.config.wal_mode else "PRAGMA journal_mode=DELETE;")
         self._init_schema()
+        self._init_meta()
 
     def _init_schema(self) -> None:
         self.conn.execute(
@@ -98,6 +99,28 @@ class SQLiteEmbeddingCache:
         )
         self.conn.commit()
 
+    def _init_meta(self) -> None:
+        defaults = {
+            "sets": "0",
+            "hits": "0",
+            "misses": "0",
+            "evictions": "0",
+        }
+        for key, value in defaults.items():
+            self.conn.execute(
+                "INSERT OR IGNORE INTO cache_meta(key, value) VALUES (?, ?);",
+                (key, value),
+            )
+        self.conn.commit()
+
+    def _bump_meta(self, key: str, delta: int = 1) -> None:
+        row = self.conn.execute("SELECT value FROM cache_meta WHERE key = ?;", (key,)).fetchone()
+        current = int(row[0]) if row else 0
+        self.conn.execute(
+            "INSERT OR REPLACE INTO cache_meta(key, value) VALUES (?, ?);",
+            (key, str(current + delta)),
+        )
+
     def _serialize(self, vector: list[float]) -> bytes:
         dtype = np.float16 if self.config.precision == "float16" else np.float32
         array = np.asarray(vector, dtype=dtype)
@@ -115,8 +138,11 @@ class SQLiteEmbeddingCache:
             (key,),
         ).fetchone()
         if row is None:
+            self._bump_meta("misses", 1)
+            self.conn.commit()
             return None
         blob, dimension = row
+        self._bump_meta("hits", 1)
         self.conn.execute(
             "UPDATE embeddings SET access_count = access_count + 1, last_accessed = ? WHERE cache_key = ?;",
             (int(time.time()), key),
@@ -135,6 +161,7 @@ class SQLiteEmbeddingCache:
             """,
             (key, blob, model_id, dimension, now, now),
         )
+        self._bump_meta("sets", 1)
         self.conn.commit()
         self._evict_if_needed()
 
@@ -159,10 +186,15 @@ class SQLiteEmbeddingCache:
             return
         keys = [row[0] for row in rows]
         self.conn.executemany("DELETE FROM embeddings WHERE cache_key = ?;", [(k,) for k in keys])
+        self._bump_meta("evictions", len(keys))
         self.conn.commit()
 
     def close(self) -> None:
         self.conn.close()
+
+    def stats(self) -> dict[str, int]:
+        rows = self.conn.execute("SELECT key, value FROM cache_meta;").fetchall()
+        return {key: int(value) for key, value in rows}
 
 
 class RedisEmbeddingCache:
@@ -175,6 +207,7 @@ class RedisEmbeddingCache:
         self.config = config
         self.compression = compression
         self.precision = precision
+        self._stats_key = f"{self.config.key_prefix}stats"
 
     def _serialize(self, vector: list[float]) -> bytes:
         dtype = np.float16 if self.precision == "float16" else np.float32
@@ -193,7 +226,9 @@ class RedisEmbeddingCache:
     def get(self, key: str, dimension: int) -> list[float] | None:
         data = self._redis.get(self._key(key))
         if data is None:
+            self._redis.hincrby(self._stats_key, "misses", 1)
             return None
+        self._redis.hincrby(self._stats_key, "hits", 1)
         return self._deserialize(data, dimension)
 
     def set(self, key: str, vector: list[float]) -> None:
@@ -201,3 +236,10 @@ class RedisEmbeddingCache:
         if self.config.ttl_days is not None:
             ttl = int(self.config.ttl_days * 86400)
         self._redis.set(self._key(key), self._serialize(vector), ex=ttl)
+        self._redis.hincrby(self._stats_key, "sets", 1)
+
+    def stats(self) -> dict[str, int]:
+        data = self._redis.hgetall(self._stats_key)
+        if not data:
+            return {"sets": 0, "hits": 0, "misses": 0}
+        return {k.decode("utf-8"): int(v) for k, v in data.items()}

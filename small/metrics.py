@@ -99,3 +99,14 @@ def log_metrics(metrics: CompressionMetrics) -> None:
         metrics.dictionary_overhead_pct,
         metrics.depth_utilization,
     )
+
+
+def log_cache_stats(stats: dict[str, int]) -> None:
+    logger = logging.getLogger("small.metrics")
+    logger.info(
+        "cache_sets=%d cache_hits=%d cache_misses=%d cache_evictions=%d",
+        stats.get("sets", 0),
+        stats.get("hits", 0),
+        stats.get("misses", 0),
+        stats.get("evictions", 0),
+    )
