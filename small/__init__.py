@@ -8,6 +8,21 @@ from .serialization import SerializedOutput, serialize
 from .training import TrainingExample, build_example, build_curriculum, generate_training_examples
 from .vocab import VocabExtension, plan_vocab_extension
 from .types import CompressionResult
+from .embeddings import (
+    CohereEmbeddingProvider,
+    EmbeddingProvider,
+    HuggingFaceEmbeddingProvider,
+    OllamaEmbeddingProvider,
+    OpenAIEmbeddingProvider,
+    VoyageEmbeddingProvider,
+)
+from .embedding_cache import (
+    RedisCacheConfig,
+    RedisEmbeddingCache,
+    SQLiteCacheConfig,
+    SQLiteEmbeddingCache,
+    cache_key,
+)
 
 __all__ = [
     "compress",
@@ -27,4 +42,15 @@ __all__ = [
     "generate_training_examples",
     "VocabExtension",
     "plan_vocab_extension",
+    "EmbeddingProvider",
+    "HuggingFaceEmbeddingProvider",
+    "OllamaEmbeddingProvider",
+    "OpenAIEmbeddingProvider",
+    "VoyageEmbeddingProvider",
+    "CohereEmbeddingProvider",
+    "SQLiteCacheConfig",
+    "SQLiteEmbeddingCache",
+    "RedisCacheConfig",
+    "RedisEmbeddingCache",
+    "cache_key",
 ]
