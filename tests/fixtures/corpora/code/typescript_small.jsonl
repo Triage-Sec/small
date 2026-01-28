@@ -1,0 +1,2 @@
+{"id":"ts_001","text":"export function isEven(n: number): boolean { return n % 2 === 0; }","domain":"code","language":"typescript","source":"synthetic"}
+{"id":"ts_002","text":"export class Cache<T> { private store = new Map<string, T>(); get(key: string): T | undefined { return this.store.get(key); } }","domain":"code","language":"typescript","source":"synthetic"}

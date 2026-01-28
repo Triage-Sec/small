@@ -1,0 +1,2 @@
+{"id":"qa_001","context_id":"sec_001","question":"How long until an authentication token expires due to inactivity?","answer":"24 hours","answer_type":"extractive"}
+{"id":"qa_002","context_id":"sec_002","question":"What encryption standard is required for PII at rest?","answer":"AES-256 or equivalent","answer_type":"extractive"}

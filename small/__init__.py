@@ -8,6 +8,8 @@ from .serialization import SerializedOutput, serialize
 from .training import TrainingExample, build_example, build_curriculum, generate_training_examples
 from .vocab import VocabExtension, plan_vocab_extension
 from .types import CompressionResult
+from .corpus import CorpusDocument, load_directory, load_jsonl
+from .preprocess import PreprocessConfig, preprocess_corpus
 from .embeddings import (
     CohereEmbeddingProvider,
     EmbeddingProvider,
@@ -42,6 +44,11 @@ __all__ = [
     "generate_training_examples",
     "VocabExtension",
     "plan_vocab_extension",
+    "CorpusDocument",
+    "load_directory",
+    "load_jsonl",
+    "PreprocessConfig",
+    "preprocess_corpus",
     "EmbeddingProvider",
     "HuggingFaceEmbeddingProvider",
     "OllamaEmbeddingProvider",

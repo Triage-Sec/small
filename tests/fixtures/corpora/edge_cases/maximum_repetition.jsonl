@@ -1,0 +1,2 @@
+{"id":"edge_max_001","text":"error error error error error error error error error error error error error error error error error error error error","domain":"edge_case","expected_compression_ratio":0.15}
+{"id":"edge_max_002","text":"if (x > 0) { return true; }\nif (x > 0) { return true; }\nif (x > 0) { return true; }\nif (x > 0) { return true; }\nif (x > 0) { return true; }","domain":"edge_case","expected_compression_ratio":0.25}
