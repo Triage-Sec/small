@@ -14,7 +14,7 @@ from .analysis import AnalysisConfig, compute_document_weights
 from .static_dict_builder import StaticDictionaryConfig, build_static_dictionary
 from .static_dict_io import load_static_dictionary, save_static_dictionary
 from .offline_pipeline import OfflinePipelineConfig, run_offline_analysis
-from .metrics_writer import write_cache_stats_jsonl, write_metrics_jsonl
+from .metrics_writer import write_cache_stats_jsonl, write_metrics_jsonl, write_offline_metrics_jsonl
 from .embeddings import (
     CohereEmbeddingProvider,
     EmbeddingProvider,
@@ -64,6 +64,7 @@ __all__ = [
     "run_offline_analysis",
     "write_cache_stats_jsonl",
     "write_metrics_jsonl",
+    "write_offline_metrics_jsonl",
     "EmbeddingProvider",
     "HuggingFaceEmbeddingProvider",
     "OllamaEmbeddingProvider",
