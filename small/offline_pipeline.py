@@ -10,6 +10,7 @@ from .corpus import CorpusDocument
 from .embedding_cache import SQLiteEmbeddingCache, cache_key
 from .embeddings import EmbeddingProvider
 from .metrics import log_cache_stats
+from .metrics_writer import write_cache_stats_jsonl
 
 
 @dataclass(frozen=True)
@@ -46,6 +47,7 @@ def run_offline_analysis(
     cache: SQLiteEmbeddingCache | None,
     analysis_config: AnalysisConfig,
     pipeline_config: OfflinePipelineConfig,
+    cache_metrics_path: str | None = None,
 ) -> list[float]:
     texts = [doc.text for doc in docs]
     if not texts:
@@ -68,5 +70,8 @@ def run_offline_analysis(
 
     weights = compute_document_weights(texts, _Provider(vectors), analysis_config)
     if cache:
-        log_cache_stats(cache.stats())
+        stats = cache.stats()
+        log_cache_stats(stats)
+        if cache_metrics_path:
+            write_cache_stats_jsonl(cache_metrics_path, stats)
     return weights

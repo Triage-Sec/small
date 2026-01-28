@@ -103,10 +103,15 @@ def log_metrics(metrics: CompressionMetrics) -> None:
 
 def log_cache_stats(stats: dict[str, int]) -> None:
     logger = logging.getLogger("small.metrics")
+    hits = stats.get("hits", 0)
+    misses = stats.get("misses", 0)
+    total = hits + misses
+    hit_rate = (hits / total) if total else 0.0
     logger.info(
-        "cache_sets=%d cache_hits=%d cache_misses=%d cache_evictions=%d",
+        "cache_sets=%d cache_hits=%d cache_misses=%d cache_evictions=%d cache_hit_rate=%.4f",
         stats.get("sets", 0),
-        stats.get("hits", 0),
-        stats.get("misses", 0),
+        hits,
+        misses,
         stats.get("evictions", 0),
+        hit_rate,
     )
