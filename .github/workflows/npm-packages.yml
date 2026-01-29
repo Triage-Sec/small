@@ -11,6 +11,8 @@ on:
     paths:
       - 'packages/**'
       - '.github/workflows/npm-packages.yml'
+  release:
+    types: [published]
   workflow_dispatch:
 
 env:
@@ -130,3 +132,56 @@ jobs:
       - name: Run ML tests
         working-directory: packages/ml
         run: npm test || true
+
+        publish:
+          name: Publish to npm
+          needs: [test-rust, test-sdk, test-ml]
+          runs-on: ubuntu-latest
+          if: github.event_name == 'release' && github.event.action == 'published'
+          permissions:
+            contents: read
+            id-token: write
+          steps:
+            - uses: actions/checkout@v4
+      
+            - name: Install Rust
+              uses: dtolnay/rust-toolchain@stable
+              with:
+                targets: wasm32-unknown-unknown
+      
+            - name: Install wasm-pack
+              run: cargo install wasm-pack
+      
+            - name: Build WASM
+              working-directory: packages/core
+              run: wasm-pack build --target bundler --release --out-dir ../sdk/src/wasm/pkg
+      
+            - name: Setup Node.js
+              uses: actions/setup-node@v4
+              with:
+                node-version: 20
+                registry-url: 'https://registry.npmjs.org'
+      
+            - name: Install and build SDK
+              working-directory: packages/sdk
+              run: |
+                npm install
+                npm run build
+      
+            - name: Install and build ML
+              working-directory: packages/ml
+              run: |
+                npm install
+                npm run build
+      
+            - name: Publish SDK
+              working-directory: packages/sdk
+              run: npm publish --access public
+              env:
+                NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+      
+            - name: Publish ML
+              working-directory: packages/ml
+              run: npm publish --access public
+              env:
+                NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}

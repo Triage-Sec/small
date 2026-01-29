@@ -100,7 +100,7 @@ test.describe('Browser Compression', () => {
       );
       await initWasm();
 
-      const compressor = await createStreamingCompressor();
+      const compressor = await createStreamingCompressor({});
 
       // Add chunks
       await compressor.addChunk([1, 2, 3, 1, 2, 3]);
