@@ -40,7 +40,7 @@ test.describe('Browser Compression', () => {
       await initWasm();
 
       const tokens = [1, 2, 3, 1, 2, 3, 1, 2, 3, 1, 2, 3, 1, 2, 3];
-      const result = await compress(tokens);
+      const result = await compress(tokens, {});
 
       return {
         originalLength: result.originalLength,
@@ -59,7 +59,7 @@ test.describe('Browser Compression', () => {
       await initWasm();
 
       const tokens = [1, 2, 3, 1, 2, 3, 1, 2, 3, 1, 2, 3, 1, 2, 3];
-      const compressed = await compress(tokens);
+      const compressed = await compress(tokens, {});
       const restored = await decompress(compressed.serializedTokens);
 
       return {
@@ -80,7 +80,7 @@ test.describe('Browser Compression', () => {
 
       // Generate 10K tokens with patterns
       const tokens = Array.from({ length: 10000 }, (_, i) => i % 100);
-      const result = await compress(tokens);
+      const result = await compress(tokens, {});
 
       return {
         originalLength: result.originalLength,
@@ -164,7 +164,7 @@ test.describe('Browser Error Handling', () => {
       const { compress, initWasm } = await import('@small-ltsc/sdk');
       await initWasm();
 
-      const result = await compress([]);
+      const result = await compress([], {});
       return {
         originalLength: result.originalLength,
         compressedLength: result.compressedLength,
@@ -180,7 +180,7 @@ test.describe('Browser Error Handling', () => {
       const { compress, initWasm } = await import('@small-ltsc/sdk');
       await initWasm();
 
-      const result = await compress([42]);
+      const result = await compress([42], {});
       return {
         originalLength: result.originalLength,
         compressedLength: result.compressedLength,
@@ -199,7 +199,7 @@ test.describe('Browser Error Handling', () => {
 
       // All unique tokens - no patterns
       const tokens = Array.from({ length: 100 }, (_, i) => i);
-      const result = await compress(tokens);
+      const result = await compress(tokens, {});
 
       return {
         originalLength: result.originalLength,

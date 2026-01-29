@@ -1,6 +1,6 @@
 {
   "name": "@small-ltsc/ml",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "ML features for Small LTSC - Pattern importance scoring and quality prediction",
   "type": "module",
   "main": "./dist/esm/index.js",
