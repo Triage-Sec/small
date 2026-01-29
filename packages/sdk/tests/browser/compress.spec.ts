@@ -60,7 +60,7 @@ test.describe('Browser Compression', () => {
 
       const tokens = [1, 2, 3, 1, 2, 3, 1, 2, 3, 1, 2, 3, 1, 2, 3];
       const compressed = await compress(tokens, {});
-      const restored = await decompress(compressed.serializedTokens);
+      const restored = await decompress(compressed.serializedTokens, {});
 
       return {
         original: tokens,
