@@ -16,8 +16,6 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from enum import Enum
-from typing import Callable
-
 from .config import CompressionConfig
 from .types import Candidate, Token, TokenSeq
 

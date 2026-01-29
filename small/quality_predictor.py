@@ -122,7 +122,7 @@ class CompressionQualityPredictor:
             
             # Variance in pattern lengths
             mean = features["avg_pattern_length"]
-            variance = sum((l - mean) ** 2 for l in lengths) / len(lengths)
+            variance = sum((length - mean) ** 2 for length in lengths) / len(lengths)
             features["pattern_length_variance"] = variance
         else:
             features["avg_pattern_length"] = 0.0

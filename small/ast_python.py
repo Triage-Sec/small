@@ -6,8 +6,6 @@ import ast
 import tokenize
 from dataclasses import dataclass
 from io import StringIO
-from typing import Iterable
-
 from .config import CompressionConfig
 from .types import Candidate, Token
 from .utils import is_compressible

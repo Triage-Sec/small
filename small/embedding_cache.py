@@ -9,8 +9,6 @@ import time
 import unicodedata
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Iterable
-
 import numpy as np
 
 

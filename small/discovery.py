@@ -49,7 +49,6 @@ def discover_candidates(tokens: TokenSeq, max_length: int, config: CompressionCo
     min_length = config.min_subsequence_length if config else 2
     if max_length < min_length:
         return []
-    n = len(tokens)
     candidates: list[Candidate] = []
     extra_cost = 1 if config and config.dict_length_enabled else 0
 

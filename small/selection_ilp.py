@@ -118,13 +118,8 @@ def select_occurrences_ilp(
     A_ub_rows: list[np.ndarray] = []
     b_ub: list[float] = []
     
-    A_eq_rows: list[np.ndarray] = []
-    b_eq: list[float] = []
-    
     # 1. Non-overlapping constraints
     # For each position in the sequence, at most one occurrence can cover it
-    max_pos = max(occ.start + occ.length for occ in occurrences)
-    
     # Build position-to-occurrences mapping
     pos_to_occs: dict[int, list[int]] = {}
     for i, occ in enumerate(occurrences):

@@ -6,8 +6,6 @@ from dataclasses import dataclass
 from typing import Iterable
 
 from .config import CompressionConfig
-from .types import Token
-
 
 @dataclass(frozen=True)
 class VocabExtension:

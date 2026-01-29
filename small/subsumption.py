@@ -51,9 +51,6 @@ def build_subsumption_graph(candidates: list[Candidate]) -> SubsumptionGraph:
     subsumes: dict[int, set[int]] = {i: set() for i in range(n)}
     subsumed_by: dict[int, set[int]] = {i: set() for i in range(n)}
     
-    # Build index for fast lookup
-    pattern_to_idx: dict[tuple[Token, ...], int] = {p: i for i, p in enumerate(patterns)}
-    
     for i, longer in enumerate(patterns):
         longer_len = len(longer)
         

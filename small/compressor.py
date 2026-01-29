@@ -5,7 +5,7 @@ from __future__ import annotations
 from typing import Sequence
 
 from .config import CompressionConfig
-from .dictionary import build_body_tokens, build_dictionary_tokens
+from .dictionary import build_body_tokens
 from .dictionary_store import CompressionDictionary
 from .ast_python import discover_ast_candidates
 from .domain import detect_domain
@@ -17,7 +17,6 @@ from .static_dicts import (
     DOMAIN_TO_STATIC_ID,
     get_static_dictionary,
     parse_static_dictionary_marker,
-    static_dictionary_marker,
 )
 from .types import CompressionResult, Token, TokenSeq
 from .quality_predictor import create_predictor

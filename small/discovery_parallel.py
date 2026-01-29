@@ -67,8 +67,6 @@ def discover_candidates_parallel(tokens: TokenSeq, config: CompressionConfig) ->
     if max_len < min_len:
         return []
     
-    extra_cost = 1 if config.dict_length_enabled else 0
-    
     # For small inputs, use simple parallel by length
     if n < 5000:
         return _parallel_by_length(tokens, config)

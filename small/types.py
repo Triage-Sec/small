@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from typing import Hashable, Iterable, Sequence
+from typing import Hashable, Sequence
 
 Token = Hashable
 TokenSeq = Sequence[Token]

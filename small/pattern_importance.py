@@ -19,7 +19,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Protocol
 
-from .types import Candidate, Token, TokenSeq
+from .types import Candidate, TokenSeq
 
 
 class ImportanceScorer(Protocol):

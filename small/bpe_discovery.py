@@ -16,8 +16,6 @@ from __future__ import annotations
 
 from collections import Counter
 from dataclasses import dataclass
-from typing import Iterator
-
 from .config import CompressionConfig
 from .types import Candidate, Token, TokenSeq
 from .utils import is_compressible

@@ -3,8 +3,6 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Iterable
-
 from .config import CompressionConfig
 from .dictionary import order_dictionary_entries
 from .types import Token

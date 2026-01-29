@@ -72,7 +72,6 @@ class CompressionEngine:
         total_candidates = 0
         
         prev_length = len(working_tokens)
-        prev_dict_size = 0  # Track dictionary growth
 
         for depth in range(depth_limit):
             candidates: list[Candidate] = []
@@ -179,7 +178,6 @@ class CompressionEngine:
                     break
             
             prev_length = new_length
-            prev_dict_size = new_dict_size
             
             if not config.hierarchical_enabled:
                 break

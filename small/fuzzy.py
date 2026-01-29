@@ -2,8 +2,6 @@
 
 from __future__ import annotations
 
-from typing import Iterable
-
 from .config import CompressionConfig
 from .types import Candidate, Patch, Token, TokenSeq
 from .utils import is_meta_token
