@@ -3,7 +3,10 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Optional
+from typing import TYPE_CHECKING, Optional
+
+if TYPE_CHECKING:
+    from .pattern_cache import PatternCache
 
 
 @dataclass(frozen=True)
@@ -30,7 +33,7 @@ class CompressionConfig:
     hierarchical_min_improvement: float = 0.02  # Early stopping threshold
 
     # Selection algorithm settings
-    # Modes: "greedy", "optimal", "beam", "ilp"
+    # Modes: "greedy", "optimal", "beam", "ilp", "semantic"
     selection_mode: str = "greedy"
     beam_width: int = 8
     ilp_time_limit: float = 1.0  # Timeout for ILP solver
@@ -40,6 +43,13 @@ class CompressionConfig:
     ilp_use_relaxation: bool = (
         True  # Use LP relaxation for larger inputs instead of beam search
     )
+
+    # Semantic selection settings (requires embedding provider)
+    semantic_context_window: int = 8  # Tokens around occurrence for context
+    semantic_similarity_threshold: float = 0.7  # Similarity above this = good candidate
+    semantic_diversity_penalty: float = 0.5  # Penalty for diverse context patterns
+    semantic_embedding_provider: str | None = None  # "openai", "voyage", "cohere", etc.
+    semantic_embedding_model: str | None = None  # Provider-specific model name
 
     # AST-aware compression (Python)
     ast_enabled: bool = True
@@ -107,6 +117,28 @@ class CompressionConfig:
         0.05  # Skip compression if predicted degradation exceeds
     )
     quality_conservative: bool = False  # Be more conservative in quality predictions
+
+    # Cross-document pattern cache
+    pattern_cache: Optional["PatternCache"] = None
+    warm_start_top_k: int = 50  # Max cached patterns to inject as candidates
+    cache_min_frequency: int = 2  # Min times pattern must be seen before reuse
+    cache_learning_enabled: bool = True  # Record patterns to cache after compression
+
+    # Streaming compression settings
+    streaming_chunk_size: int = 8192  # Tokens per chunk in streaming mode
+    streaming_overlap: int = 1024  # Overlap between chunks for cross-boundary patterns
+    streaming_max_memory_mb: int = 100  # Max memory budget for streaming
+
+    # Template extraction settings
+    enable_template_extraction: bool = False  # Enable parameterized pattern discovery
+    template_min_instances: int = 3  # Min occurrences to form a template
+    template_max_slots: int = 3  # Max variable slots per template
+    template_max_slot_length: int = 10  # Max tokens in a single slot
+    template_min_frame_ratio: float = 0.6  # Min fraction of frame that must be fixed
+    template_slot_marker: str = "<Slot>"  # Token for slot positions in frame
+    template_slot_val_start: str = "<SlotVal>"  # Slot value delimiter start
+    template_slot_val_end: str = "</SlotVal>"  # Slot value delimiter end
+    template_priority_bonus: int = 1  # Priority bonus for template candidates
 
     # Reproducibility and debugging
     rng_seed: Optional[int] = None

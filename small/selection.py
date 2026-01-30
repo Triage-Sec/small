@@ -459,7 +459,9 @@ def _beam_search_with_savings(
 
 
 def select_occurrences(
-    candidates: Iterable[Candidate], config: CompressionConfig
+    candidates: Iterable[Candidate],
+    config: CompressionConfig,
+    tokens: tuple | list | None = None,
 ) -> SelectionResult:
     """Select non-overlapping occurrences for compression.
 
@@ -468,8 +470,16 @@ def select_occurrences(
     - optimal: Weighted interval scheduling with proper savings
     - beam: Beam search balancing exploration and exploitation
     - ilp: Integer linear programming (requires scipy, see selection_ilp module)
+    - semantic: Embedding-based selection (requires embedding provider)
+
+    Args:
+        candidates: Pattern candidates to select from
+        config: Compression configuration
+        tokens: Original token sequence (required for semantic mode)
     """
-    occurrences = _build_occurrences(candidates)
+    # Convert to list once for modes that need it
+    candidates_list = list(candidates)
+    occurrences = _build_occurrences(candidates_list)
 
     if config.selection_mode == "greedy":
         selected = _non_overlapping_with_compressibility(occurrences, config)
@@ -482,11 +492,73 @@ def select_occurrences(
         try:
             from .selection_ilp import select_occurrences_ilp
 
-            selected = select_occurrences_ilp(candidates, config)
+            selected = select_occurrences_ilp(candidates_list, config)
         except ImportError:
             # Fall back to optimal if scipy not available
             selected = _weighted_interval_scheduling_with_savings(occurrences, config)
+    elif config.selection_mode == "semantic":
+        selected = _select_semantic_with_fallback(candidates_list, tokens, config)
     else:
         raise ValueError(f"Unsupported selection mode: {config.selection_mode}")
 
     return SelectionResult(selected=selected)
+
+
+def _select_semantic_with_fallback(
+    candidates: list[Candidate],
+    tokens: tuple | list | None,
+    config: CompressionConfig,
+) -> list[Occurrence]:
+    """Attempt semantic selection, falling back to optimal if provider unavailable."""
+    import warnings
+
+    # Check if provider is configured
+    if not config.semantic_embedding_provider:
+        warnings.warn(
+            "selection_mode='semantic' requires semantic_embedding_provider. "
+            "Falling back to 'optimal' selection.",
+            RuntimeWarning,
+        )
+        occurrences = _build_occurrences(candidates)
+        return _weighted_interval_scheduling_with_savings(occurrences, config)
+
+    # Check if tokens provided
+    if tokens is None:
+        warnings.warn(
+            "selection_mode='semantic' requires tokens for context extraction. "
+            "Falling back to 'optimal' selection.",
+            RuntimeWarning,
+        )
+        occurrences = _build_occurrences(candidates)
+        return _weighted_interval_scheduling_with_savings(occurrences, config)
+
+    # Try to create provider
+    try:
+        from .embeddings import get_provider_from_config
+
+        provider = get_provider_from_config(
+            config.semantic_embedding_provider,
+            model=config.semantic_embedding_model,
+        )
+
+        if provider is None:
+            warnings.warn(
+                f"Could not initialize embedding provider '{config.semantic_embedding_provider}'. "
+                "Check API key and package installation. Falling back to 'optimal' selection.",
+                RuntimeWarning,
+            )
+            occurrences = _build_occurrences(candidates)
+            return _weighted_interval_scheduling_with_savings(occurrences, config)
+
+        # Use semantic selection
+        from .selection_semantic import select_occurrences_semantic
+
+        return select_occurrences_semantic(candidates, tokens, config, provider)
+
+    except Exception as e:
+        warnings.warn(
+            f"Semantic selection failed: {e}. Falling back to 'optimal' selection.",
+            RuntimeWarning,
+        )
+        occurrences = _build_occurrences(candidates)
+        return _weighted_interval_scheduling_with_savings(occurrences, config)

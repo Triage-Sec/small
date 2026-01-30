@@ -18,7 +18,7 @@ from .static_dicts import (
     get_static_dictionary,
     parse_static_dictionary_marker,
 )
-from .types import CompressionResult, Token, TokenSeq
+from .types import Candidate, CompressionResult, Token, TokenSeq
 from .quality_predictor import create_predictor
 from .utils import (
     is_meta_token,
@@ -95,18 +95,43 @@ def _compress_internal(
             working_tokens, static_dict, cfg
         )
 
+    # Get warm-start candidates from pattern cache
+    all_preferred: list[Candidate] = list(preferred_candidates or [])
+    cache_positions: dict[tuple[Token, ...], tuple[int, ...]] = {}
+    if cfg.pattern_cache is not None:
+        warm_start = cfg.pattern_cache.get_warm_start_candidates(
+            working_tokens, top_k=cfg.warm_start_top_k
+        )
+        for pattern_tokens, positions, priority in warm_start:
+            candidate = Candidate(
+                subsequence=pattern_tokens,
+                length=len(pattern_tokens),
+                positions=positions,
+                priority=priority,
+            )
+            all_preferred.append(candidate)
+            cache_positions[pattern_tokens] = positions
+
     engine = default_engine(cfg)
-    if preferred_candidates:
+    if all_preferred:
         # Prepend preferred candidates by injecting a temporary discovery stage.
         class _PreferredStage:
             name = "preferred"
 
             def discover(self, tokens: TokenSeq, config: CompressionConfig) -> list:
-                return preferred_candidates or []
+                return all_preferred
 
         engine = CompressionEngine((_PreferredStage(),) + engine.discovery_stages)  # type: ignore[arg-type]
 
     working_tokens, dictionary_map = engine.compress_tokens(working_tokens, cfg)
+
+    # Record patterns to cache for future compressions
+    if cfg.pattern_cache is not None and cfg.cache_learning_enabled and dictionary_map:
+        # Build positions map from dictionary entries
+        positions_map: dict[tuple[Token, ...], tuple[int, ...]] = dict(cache_positions)
+        # Note: We don't have exact positions for newly discovered patterns here,
+        # but the cache will still track frequency and savings
+        cfg.pattern_cache.record_patterns(dictionary_map, positions_map)
 
     body_tokens = working_tokens
     dictionary = CompressionDictionary(

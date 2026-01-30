@@ -91,6 +91,48 @@ Add to Windsurf MCP configuration:
 }
 ```
 
+### Warp Terminal
+
+Warp provides native MCP support through its AI Agent Mode. To add Small:
+
+1. Open Warp and navigate to **Settings > AI > Manage MCP servers** (or use `Cmd+Shift+P` and search for "MCP")
+2. Click **+ Add** and paste the following JSON:
+
+```json
+{
+  "mcpServers": {
+    "small-ltsc": {
+      "command": "/path/to/venv/bin/python",
+      "args": ["-m", "small.mcp"]
+    }
+  }
+}
+```
+
+3. Click **Save** and start the server
+
+**Tips for Warp:**
+- Use absolute paths for the Python interpreter (Warp may not inherit your shell PATH)
+- Enable "Start on launch" if you want compression tools always available
+- Check server logs via **View Logs** if tools don't appear
+- In Agent Mode (`Cmd+I` / `Ctrl+I`), ask: "Compress this JSON and show savings"
+
+**Environment variables:** Add any required variables in the Warp MCP config:
+
+```json
+{
+  "mcpServers": {
+    "small-ltsc": {
+      "command": "/path/to/venv/bin/python",
+      "args": ["-m", "small.mcp"],
+      "env": {
+        "SMALL_MCP_LOG_LEVEL": "DEBUG"
+      }
+    }
+  }
+}
+```
+
 ### Custom MCP Client
 
 For programmatic use:
@@ -118,7 +160,7 @@ Compress a sequence of LLM tokens using lossless LTSC compression.
 - `tokens` (required): Array of token IDs to compress
 - `min_length`: Minimum pattern length (default: 2)
 - `max_length`: Maximum pattern length (default: 16)
-- `selection_mode`: Algorithm - "greedy", "optimal", or "beam" (default: "greedy")
+- `selection_mode`: Algorithm - "greedy", "optimal", "beam", "ilp", or "semantic" (default: "greedy")
 
 **Returns:** Compressed tokens, compression ratio, patterns found, timing
 

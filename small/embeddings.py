@@ -220,3 +220,106 @@ class CohereEmbeddingProvider:
 
     def model_id(self) -> str:
         return self.model
+
+
+# Provider name mappings for create_provider factory
+PROVIDER_ALIASES: dict[str, str] = {
+    "openai": "openai",
+    "gpt": "openai",
+    "voyage": "voyage",
+    "voyageai": "voyage",
+    "cohere": "cohere",
+    "sentence-transformers": "huggingface",
+    "sentence_transformers": "huggingface",
+    "st": "huggingface",
+    "sbert": "huggingface",
+    "huggingface": "huggingface",
+    "hf": "huggingface",
+    "ollama": "ollama",
+}
+
+# Default models for each provider
+DEFAULT_MODELS: dict[str, str] = {
+    "openai": "text-embedding-3-small",
+    "voyage": "voyage-3-lite",
+    "cohere": "embed-english-v3.0",
+    "huggingface": "all-MiniLM-L6-v2",
+    "ollama": "nomic-embed-text",
+}
+
+
+def create_provider(
+    name: str,
+    model: str | None = None,
+    **kwargs,
+) -> EmbeddingProvider:
+    """Create an embedding provider by name.
+
+    Args:
+        name: Provider name ("openai", "voyage", "cohere", "sentence-transformers", "ollama")
+        model: Model name (provider-specific default if not set)
+        **kwargs: Additional provider-specific arguments
+
+    Returns:
+        EmbeddingProvider instance
+
+    Raises:
+        ValueError: If provider name is unknown
+        ImportError: If required dependencies are missing
+    """
+    # Normalize name
+    normalized = PROVIDER_ALIASES.get(name.lower())
+    if normalized is None:
+        raise ValueError(
+            f"Unknown embedding provider: {name}. "
+            f"Supported: openai, voyage, cohere, sentence-transformers, ollama"
+        )
+
+    # Get default model if not specified
+    if model is None:
+        model = DEFAULT_MODELS.get(normalized, "")
+
+    if normalized == "openai":
+        return OpenAIEmbeddingProvider(model=model, **kwargs)
+
+    elif normalized == "voyage":
+        return VoyageEmbeddingProvider(model=model, **kwargs)
+
+    elif normalized == "cohere":
+        return CohereEmbeddingProvider(model=model, **kwargs)
+
+    elif normalized == "huggingface":
+        return HuggingFaceEmbeddingProvider(model_name=model, **kwargs)
+
+    elif normalized == "ollama":
+        return OllamaEmbeddingProvider(model=model, **kwargs)
+
+    else:
+        raise ValueError(f"Unknown provider: {normalized}")
+
+
+def get_provider_from_config(
+    provider_name: str | None,
+    model: str | None = None,
+    **kwargs,
+) -> EmbeddingProvider | None:
+    """Create provider from config settings, returning None if unavailable.
+
+    This is a convenience wrapper that catches configuration errors
+    and returns None instead of raising, for graceful fallback.
+
+    Args:
+        provider_name: Provider name or None
+        model: Model name or None (uses provider default)
+        **kwargs: Additional provider-specific arguments
+
+    Returns:
+        EmbeddingProvider instance or None if unavailable
+    """
+    if provider_name is None:
+        return None
+
+    try:
+        return create_provider(provider_name, model=model, **kwargs)
+    except (ValueError, ImportError):
+        return None

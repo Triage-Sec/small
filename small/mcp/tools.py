@@ -13,6 +13,7 @@ from typing import TYPE_CHECKING, Any, Callable
 
 from ..compressor import compress, decompress
 from ..config import CompressionConfig
+from ..pattern_cache import PatternCache
 from .metrics import MetricsStore, OperationMetrics
 
 if TYPE_CHECKING:
@@ -254,15 +255,39 @@ TOOL_DEFINITIONS = [
         ),
         "inputSchema": {"type": "object", "properties": {}},
     },
+    {
+        "name": "get_pattern_cache_stats",
+        "description": (
+            "Get statistics about the cross-document pattern cache. "
+            "Shows cached patterns, hit rate, and cumulative savings from pattern reuse. "
+            "The pattern cache learns from previous compressions to improve future ones."
+        ),
+        "inputSchema": {"type": "object", "properties": {}},
+    },
+    {
+        "name": "clear_pattern_cache",
+        "description": (
+            "Clear the cross-document pattern cache. "
+            "Useful when switching to a completely different document corpus. "
+            "Returns stats from the cleared cache."
+        ),
+        "inputSchema": {"type": "object", "properties": {}},
+    },
 ]
 
 
 class ToolHandlers:
     """Collection of tool handler functions."""
 
-    def __init__(self, config: MCPConfig, metrics: MetricsStore) -> None:
+    def __init__(
+        self,
+        config: MCPConfig,
+        metrics: MetricsStore,
+        pattern_cache: PatternCache | None = None,
+    ) -> None:
         self.config = config
         self.metrics = metrics
+        self.pattern_cache = pattern_cache
 
     def _validate_tokens(
         self,
@@ -322,6 +347,8 @@ class ToolHandlers:
             discovery_mode=self.config.discovery_mode,
             selection_mode=selection_mode or self.config.selection_mode,
             verify=verify if verify is not None else self.config.verify_roundtrip,
+            pattern_cache=self.pattern_cache,
+            warm_start_top_k=self.config.warm_start_top_k,
         )
 
     def compress_tokens(self, params: dict[str, Any]) -> dict[str, Any]:
@@ -726,12 +753,35 @@ class ToolHandlers:
         old_session = self.metrics.reset()
         return {"reset": True, "previous_session": old_session}
 
+    def get_pattern_cache_stats(self, params: dict[str, Any]) -> dict[str, Any]:
+        """Handle get_pattern_cache_stats tool call."""
+        if self.pattern_cache is None:
+            return {
+                "enabled": False,
+                "message": "Pattern cache is not enabled for this session",
+            }
+        stats = self.pattern_cache.stats()
+        stats["enabled"] = True
+        return stats
+
+    def clear_pattern_cache(self, params: dict[str, Any]) -> dict[str, Any]:
+        """Handle clear_pattern_cache tool call."""
+        if self.pattern_cache is None:
+            return {
+                "cleared": False,
+                "message": "Pattern cache is not enabled for this session",
+            }
+        old_stats = self.pattern_cache.clear()
+        return {"cleared": True, "previous_stats": old_stats}
+
 
 def create_tool_handlers(
-    config: MCPConfig, metrics: MetricsStore
+    config: MCPConfig,
+    metrics: MetricsStore,
+    pattern_cache: PatternCache | None = None,
 ) -> dict[str, Callable[[dict[str, Any]], dict[str, Any]]]:
     """Create a mapping of tool names to handler functions."""
-    handlers = ToolHandlers(config, metrics)
+    handlers = ToolHandlers(config, metrics, pattern_cache)
     return {
         "compress_tokens": handlers.compress_tokens,
         "decompress_tokens": handlers.decompress_tokens,
@@ -742,4 +792,6 @@ def create_tool_handlers(
         "get_historical_metrics": handlers.get_historical_metrics,
         "run_benchmark": handlers.run_benchmark,
         "reset_session_metrics": handlers.reset_session_metrics,
+        "get_pattern_cache_stats": handlers.get_pattern_cache_stats,
+        "clear_pattern_cache": handlers.clear_pattern_cache,
     }

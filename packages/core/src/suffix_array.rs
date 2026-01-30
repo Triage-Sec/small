@@ -223,6 +223,21 @@ pub fn non_overlapping_positions(positions: &[usize], length: usize) -> Vec<usiz
     result
 }
 
+/// Build suffix array with automatic parallel/sequential selection.
+///
+/// When compiled with the `parallel` feature and input size exceeds threshold,
+/// uses parallel construction for improved performance.
+#[cfg(feature = "parallel")]
+pub fn build_suffix_array_auto(tokens: &[Token], enable_parallel: bool) -> SuffixArray {
+    crate::suffix_array_parallel::build_suffix_array_auto(tokens, enable_parallel)
+}
+
+/// Build suffix array (sequential only when parallel feature not enabled).
+#[cfg(not(feature = "parallel"))]
+pub fn build_suffix_array_auto(tokens: &[Token], _enable_parallel: bool) -> SuffixArray {
+    SuffixArray::build(tokens)
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;

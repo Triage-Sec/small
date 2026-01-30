@@ -27,8 +27,8 @@ def validate_config(config: CompressionConfig) -> list[ConfigWarning]:
         raise ValueError("Meta-token pool size must be positive.")
     if config.hierarchical_max_depth < 1:
         raise ValueError("Hierarchical max depth must be >= 1.")
-    if config.selection_mode not in {"greedy", "optimal", "beam"}:
-        raise ValueError("Selection mode must be one of: greedy, optimal, beam.")
+    if config.selection_mode not in {"greedy", "optimal", "beam", "ilp", "semantic"}:
+        raise ValueError("Selection mode must be one of: greedy, optimal, beam, ilp, semantic.")
     if config.selection_mode == "beam" and config.beam_width < 1:
         raise ValueError("Beam width must be >= 1.")
     if (

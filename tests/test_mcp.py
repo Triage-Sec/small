@@ -366,6 +366,8 @@ class TestCreateToolHandlers:
             "get_historical_metrics",
             "run_benchmark",
             "reset_session_metrics",
+            "get_pattern_cache_stats",
+            "clear_pattern_cache",
         }
         assert set(handlers.keys()) == expected
 

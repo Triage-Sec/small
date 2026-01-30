@@ -12,6 +12,7 @@ import sys
 from typing import Any
 
 from .. import __version__
+from ..pattern_cache import PatternCache
 from .config import MCPConfig
 from .metrics import MetricsStore
 from .tools import TOOL_DEFINITIONS, create_tool_handlers
@@ -30,8 +31,30 @@ class MCPServer:
         """
         self.config = config or MCPConfig.from_env()
         self.metrics = MetricsStore(self.config.metrics_path)
-        self.tool_handlers = create_tool_handlers(self.config, self.metrics)
+        self.pattern_cache = self._init_pattern_cache()
+        self.tool_handlers = create_tool_handlers(
+            self.config, self.metrics, self.pattern_cache
+        )
         self._setup_logging()
+
+    def _init_pattern_cache(self) -> PatternCache | None:
+        """Initialize pattern cache if enabled."""
+        if not self.config.enable_pattern_cache:
+            return None
+
+        cache = PatternCache(
+            max_patterns=self.config.pattern_cache_max_patterns,
+            min_frequency=2,
+            decay_half_life=100,
+        )
+
+        # Load existing cache from disk if available
+        cache_path = self.config.pattern_cache_path
+        if cache_path and cache_path.exists():
+            if cache.load(cache_path):
+                logger.info("Loaded pattern cache: %d patterns", len(cache))
+
+        return cache
 
     def _setup_logging(self) -> None:
         """Configure logging based on config."""
@@ -194,24 +217,46 @@ class MCPServer:
         logger.info("Small LTSC MCP server starting (version %s)", __version__)
         logger.info("Metrics: %s", self.config.metrics_path or "disabled")
         logger.info(
+            "Pattern cache: %s (%d patterns)",
+            "enabled" if self.pattern_cache else "disabled",
+            len(self.pattern_cache) if self.pattern_cache else 0,
+        )
+        logger.info(
             "Max tokens: %d, Max text: %d chars",
             self.config.max_input_tokens,
             self.config.max_text_length,
         )
 
-        for line in sys.stdin:
-            line = line.strip()
-            if not line:
-                continue
+        try:
+            for line in sys.stdin:
+                line = line.strip()
+                if not line:
+                    continue
 
+                try:
+                    request = json.loads(line)
+                    self.handle_request(request)
+                except json.JSONDecodeError as e:
+                    logger.error("JSON parse error: %s", e)
+                    # Can't send proper response without request_id
+                except Exception as e:
+                    logger.exception("Unexpected error handling request: %s", e)
+        finally:
+            # Save pattern cache on shutdown
+            self._save_pattern_cache()
+
+    def _save_pattern_cache(self) -> None:
+        """Save pattern cache to disk."""
+        if self.pattern_cache is None:
+            return
+
+        cache_path = self.config.pattern_cache_path
+        if cache_path:
             try:
-                request = json.loads(line)
-                self.handle_request(request)
-            except json.JSONDecodeError as e:
-                logger.error("JSON parse error: %s", e)
-                # Can't send proper response without request_id
-            except Exception as e:
-                logger.exception("Unexpected error handling request: %s", e)
+                self.pattern_cache.save(cache_path)
+                logger.info("Saved pattern cache: %d patterns", len(self.pattern_cache))
+            except OSError as e:
+                logger.warning("Failed to save pattern cache: %s", e)
 
 
 def create_server(config: MCPConfig | None = None) -> MCPServer:

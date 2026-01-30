@@ -27,7 +27,8 @@ def perform_swaps(
 
     pool = generate_meta_token_pool(config, tokens)
 
-    selection = select_occurrences(candidates, config)
+    # Pass tokens for semantic selection mode (needs context for embeddings)
+    selection = select_occurrences(candidates, config, tokens=tokens)
     occurrences_by_subseq: dict[tuple[Token, ...], list[Occurrence]] = {}
     for occ in selection.selected:
         occurrences_by_subseq.setdefault(occ.subsequence, []).append(occ)

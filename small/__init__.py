@@ -107,6 +107,14 @@ from .embeddings import (
     OllamaEmbeddingProvider,
     OpenAIEmbeddingProvider,
     VoyageEmbeddingProvider,
+    create_provider,
+    get_provider_from_config,
+)
+
+# Semantic selection
+from .selection_semantic import (
+    SemanticWeight,
+    select_occurrences_semantic,
 )
 from .embedding_cache import (
     RedisCacheConfig,
@@ -114,6 +122,56 @@ from .embedding_cache import (
     SQLiteCacheConfig,
     SQLiteEmbeddingCache,
     cache_key,
+)
+
+# Cross-document pattern learning
+from .pattern_cache import PatternCache, PatternEntry
+
+# Streaming compression
+from .streaming import (
+    StreamingCompressor,
+    StreamingResult,
+    StreamingStats,
+    compress_streaming,
+    decompress_streaming,
+)
+
+# Template extraction
+from .template_types import (
+    SlotMarker,
+    Template,
+    TemplateCandidate,
+    TemplateInstance,
+)
+from .template_discovery import (
+    discover_templates,
+    discover_templates_simple,
+)
+
+# Quality monitoring
+from .quality_monitor import (
+    MonitoringConfig,
+    QualityBaseline,
+    QualityMonitor,
+    QualityRecord,
+    QualitySummary,
+    HealthStatus,
+    get_global_monitor,
+    set_global_monitor,
+)
+from .quality_alerts import (
+    AlertManager,
+    AlertRule,
+    AlertSeverity,
+    QualityAlert,
+    format_alerts_ascii,
+)
+from .quality_export import (
+    export_prometheus,
+    export_summary_ascii,
+    export_health_ascii,
+    export_jsonl,
+    export_histogram_ascii,
 )
 
 __all__ = [
@@ -197,9 +255,50 @@ __all__ = [
     "OpenAIEmbeddingProvider",
     "VoyageEmbeddingProvider",
     "CohereEmbeddingProvider",
+    "create_provider",
+    "get_provider_from_config",
+    # Semantic selection
+    "SemanticWeight",
+    "select_occurrences_semantic",
+    # Embedding cache
     "SQLiteCacheConfig",
     "SQLiteEmbeddingCache",
     "RedisCacheConfig",
     "RedisEmbeddingCache",
     "cache_key",
+    # Pattern cache
+    "PatternCache",
+    "PatternEntry",
+    # Streaming
+    "StreamingCompressor",
+    "StreamingResult",
+    "StreamingStats",
+    "compress_streaming",
+    "decompress_streaming",
+    # Templates
+    "SlotMarker",
+    "Template",
+    "TemplateCandidate",
+    "TemplateInstance",
+    "discover_templates",
+    "discover_templates_simple",
+    # Quality monitoring
+    "MonitoringConfig",
+    "QualityBaseline",
+    "QualityMonitor",
+    "QualityRecord",
+    "QualitySummary",
+    "HealthStatus",
+    "get_global_monitor",
+    "set_global_monitor",
+    "AlertManager",
+    "AlertRule",
+    "AlertSeverity",
+    "QualityAlert",
+    "format_alerts_ascii",
+    "export_prometheus",
+    "export_summary_ascii",
+    "export_health_ascii",
+    "export_jsonl",
+    "export_histogram_ascii",
 ]

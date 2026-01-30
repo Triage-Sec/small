@@ -301,6 +301,96 @@ else:
     final_output = list(tokens)
 ```
 
+## Semantic Selection
+
+Semantic selection uses embeddings to make smarter pattern selection decisions. Patterns appearing in semantically similar contexts are better compression candidates (redundant information), while patterns in diverse contexts carry unique meaning and should be preserved.
+
+### Basic Usage
+
+```python
+from small import compress, CompressionConfig
+
+config = CompressionConfig(
+    selection_mode="semantic",
+    semantic_embedding_provider="openai",  # or "voyage", "sentence-transformers"
+    semantic_embedding_model="text-embedding-3-small",
+)
+
+result = compress(tokens, config)
+```
+
+### How It Works
+
+1. **Context extraction**: For each pattern occurrence, extract surrounding tokens as context
+2. **Embedding**: Get embeddings for all context windows via the configured provider
+3. **Similarity scoring**: Compute average pairwise cosine similarity across occurrences
+4. **Weight adjustment**:
+   - High similarity (above threshold) → boost pattern weight (good to compress)
+   - Low similarity (diverse contexts) → reduce pattern weight (preserve unique meaning)
+5. **Selection**: Run weighted interval scheduling with adjusted weights
+
+### Configuration Options
+
+```python
+config = CompressionConfig(
+    selection_mode="semantic",
+    
+    # Provider configuration
+    semantic_embedding_provider="openai",  # Required for semantic mode
+    semantic_embedding_model="text-embedding-3-small",  # Provider-specific model
+    
+    # Algorithm parameters
+    semantic_context_window=8,           # Tokens around occurrence for context
+    semantic_similarity_threshold=0.7,   # Similarity above this = good candidate
+    semantic_diversity_penalty=0.5,      # How much to penalize diverse patterns
+)
+```
+
+### Supported Embedding Providers
+
+| Provider | Env Variable | Default Model | Notes |
+|----------|--------------|---------------|-------|
+| `openai` | `OPENAI_API_KEY` | text-embedding-3-small | Fast, cheap |
+| `voyage` | `VOYAGE_API_KEY` | voyage-3-lite | High quality |
+| `cohere` | `COHERE_API_KEY` | embed-english-v3.0 | Good for English |
+| `sentence-transformers` | (none) | all-MiniLM-L6-v2 | Local, no API |
+| `ollama` | (none) | nomic-embed-text | Local, configurable |
+
+### Fallback Behavior
+
+If semantic selection is requested but no provider is available (missing API key or package), it gracefully falls back to `optimal` selection with a warning:
+
+```python
+# No OPENAI_API_KEY set
+config = CompressionConfig(
+    selection_mode="semantic",
+    semantic_embedding_provider="openai",
+)
+
+# Warning: selection_mode='semantic' requires semantic_embedding_provider...
+# Falls back to 'optimal' selection
+result = compress(tokens, config)
+```
+
+### Direct API Usage
+
+For more control, use the semantic selection function directly:
+
+```python
+from small.embeddings import create_provider
+from small.selection_semantic import select_occurrences_semantic
+from small.discovery_sa import discover_candidates_sa
+
+# Create provider
+provider = create_provider("openai", model="text-embedding-3-small")
+
+# Discover candidates
+candidates = discover_candidates_sa(tokens, config)
+
+# Select with semantic weights
+selected = select_occurrences_semantic(candidates, tokens, config, provider)
+```
+
 ## Configuration Reference
 
 Enable ML features via `CompressionConfig`:
@@ -323,5 +413,13 @@ config = CompressionConfig(
     quality_task_type="general",
     max_predicted_degradation=0.05,
     quality_conservative=False,
+    
+    # Semantic selection
+    selection_mode="semantic",
+    semantic_embedding_provider="openai",
+    semantic_embedding_model="text-embedding-3-small",
+    semantic_context_window=8,
+    semantic_similarity_threshold=0.7,
+    semantic_diversity_penalty=0.5,
 )
 ```

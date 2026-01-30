@@ -11,6 +11,7 @@ from .discovery import discover_candidates, discover_candidates_chunked
 from .discovery_parallel import discover_candidates_parallel
 from .discovery_sa import discover_candidates_sa
 from .fuzzy import discover_fuzzy_candidates
+from .template_discovery import discover_templates
 from .adaptive import (
     detect_regions,
     detect_regions_heuristic,
@@ -57,6 +58,34 @@ class ExactDiscoveryStage(DiscoveryStage):
 class FuzzyDiscoveryStage(DiscoveryStage):
     def discover(self, tokens: TokenSeq, config: CompressionConfig) -> list[Candidate]:
         return discover_fuzzy_candidates(tokens, config)
+
+
+@dataclass(frozen=True)
+class TemplateDiscoveryStage(DiscoveryStage):
+    """Discovery stage for parameterized template patterns."""
+
+    def discover(self, tokens: TokenSeq, config: CompressionConfig) -> list[Candidate]:
+        """Discover template patterns.
+        
+        Note: This is a discovery-only stage for now. It identifies parameterized
+        patterns but doesn't convert them to standard Candidates because:
+        1. Template frames contain slots - the actual tokens at instance positions
+           include slot values that differ between instances
+        2. Full template compression requires specialized serialization
+        
+        The discovered templates are logged/tracked but actual compression
+        relies on the exact pattern discovery finding the common subsequences.
+        Future: Integrate full template serialization for slot-aware compression.
+        """
+        # Discover templates for analysis/logging purposes
+        # Template discovery itself runs, but we don't convert to standard
+        # candidates since the positions don't map to exact matches
+        _template_candidates = discover_templates(tokens, config)
+        
+        # For now, return empty - exact discovery will find what it can
+        # Full template integration would require serialization changes
+        # to handle <SlotVal> markers in the body
+        return []
 
 
 @dataclass(frozen=True)
@@ -205,4 +234,6 @@ def default_engine(config: CompressionConfig) -> CompressionEngine:
     ]
     if config.fuzzy_enabled:
         stages.insert(0, FuzzyDiscoveryStage(name="fuzzy"))
+    if config.enable_template_extraction:
+        stages.append(TemplateDiscoveryStage(name="template"))
     return CompressionEngine(tuple(stages))

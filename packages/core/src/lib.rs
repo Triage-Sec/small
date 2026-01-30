@@ -20,6 +20,8 @@ pub mod dictionary;
 pub mod discovery;
 pub mod selection;
 pub mod suffix_array;
+#[cfg(feature = "parallel")]
+pub mod suffix_array_parallel;
 pub mod types;
 
 use config::JsCompressionConfig;

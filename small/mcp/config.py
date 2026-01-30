@@ -46,6 +46,12 @@ class MCPConfig:
     discovery_mode: str = "suffix-array"
     selection_mode: str = "greedy"
 
+    # Pattern cache settings
+    enable_pattern_cache: bool = True
+    pattern_cache_max_patterns: int = 10_000
+    pattern_cache_file: str = "pattern_cache.json"
+    warm_start_top_k: int = 50
+
     @classmethod
     def from_env(cls) -> MCPConfig:
         """Create config from environment variables."""
@@ -84,6 +90,10 @@ class MCPConfig:
             rate_limit_ops_per_min=get_env_int("RATE_LIMIT_OPS_PER_MIN", 0),
             discovery_mode=get_env("DISCOVERY_MODE", "suffix-array"),
             selection_mode=get_env("SELECTION_MODE", "greedy"),
+            enable_pattern_cache=get_env_bool("ENABLE_PATTERN_CACHE", True),
+            pattern_cache_max_patterns=get_env_int("PATTERN_CACHE_MAX_PATTERNS", 10_000),
+            pattern_cache_file=get_env("PATTERN_CACHE_FILE", "pattern_cache.json"),
+            warm_start_top_k=get_env_int("WARM_START_TOP_K", 50),
         )
 
     @property
@@ -92,3 +102,10 @@ class MCPConfig:
         if self.metrics_dir is None:
             return None
         return self.metrics_dir / self.metrics_file
+
+    @property
+    def pattern_cache_path(self) -> Path | None:
+        """Full path to pattern cache file."""
+        if self.metrics_dir is None or not self.enable_pattern_cache:
+            return None
+        return self.metrics_dir / self.pattern_cache_file
