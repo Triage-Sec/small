@@ -128,18 +128,18 @@ jobs:
           name: wasm-pkg
           path: packages/sdk/src/wasm
 
-      - name: Install and build SDK first (peer dependency)
+      - name: Build and pack SDK (peer dependency)
         working-directory: packages/sdk
         run: |
           npm install
           npm run build
-          npm link
+          npm pack
 
-      - name: Install ML dependencies with linked SDK
+      - name: Install ML dependencies with packed SDK
         working-directory: packages/ml
         run: |
-          npm link @small-ltsc/sdk
-          npm install --legacy-peer-deps
+          npm install ../sdk/small-ltsc-sdk-*.tgz
+          npm install
 
       - name: Build ML package
         working-directory: packages/ml
