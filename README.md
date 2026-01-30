@@ -2,7 +2,7 @@
 
 **Lossless Token Sequence Compression for Large Language Models**
 
-[![PyPI](https://img.shields.io/pypi/v/small)](https://pypi.org/project/small/)
+[![PyPI](https://img.shields.io/pypi/v/small-ltsc)](https://pypi.org/project/small-ltsc/)
 [![npm](https://img.shields.io/npm/v/@small-ltsc/sdk)](https://www.npmjs.com/package/@small-ltsc/sdk)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![Python 3.10+](https://img.shields.io/badge/python-3.10+-blue.svg)](https://www.python.org/downloads/)
@@ -35,12 +35,12 @@ As context augmentation techniques become standard practice (retrieval-augmented
 ### Python
 
 ```bash
-pip install small
+pip install small-ltsc
 
 # With optional dependencies
-pip install "small[analysis]"   # ML analysis tools
-pip install "small[training]"   # Fine-tuning utilities
-pip install "small[all]"        # Everything
+pip install "small-ltsc[analysis]"   # ML analysis tools
+pip install "small-ltsc[training]"   # Fine-tuning utilities
+pip install "small-ltsc[all]"        # Everything
 ```
 
 ### TypeScript/JavaScript
