@@ -265,9 +265,19 @@ class ToolHandlers:
         self.metrics = metrics
 
     def _validate_tokens(
-        self, tokens: list[int], max_tokens: int | None = None
+        self,
+        tokens: list[Any],
+        max_tokens: int | None = None,
+        *,
+        allow_strings: bool = False,
     ) -> None:
-        """Validate token input."""
+        """Validate token input.
+
+        Args:
+            tokens: Token sequence to validate.
+            max_tokens: Override for maximum token limit.
+            allow_strings: If True, allow string tokens (for serialized/compressed sequences).
+        """
         if not tokens:
             raise ValueError("tokens array cannot be empty")
 
@@ -278,8 +288,13 @@ class ToolHandlers:
                 "Consider splitting into smaller chunks."
             )
 
-        if not all(isinstance(t, int) for t in tokens):
-            raise TypeError("All tokens must be integers")
+        if allow_strings:
+            # Serialized tokens can contain int or str (dictionary markers)
+            if not all(isinstance(t, (int, str)) for t in tokens):
+                raise TypeError("Tokens must be integers or strings")
+        else:
+            if not all(isinstance(t, int) for t in tokens):
+                raise TypeError("All tokens must be integers")
 
     def _validate_text(self, text: str, max_length: int | None = None) -> None:
         """Validate text input."""
@@ -364,7 +379,8 @@ class ToolHandlers:
     def decompress_tokens(self, params: dict[str, Any]) -> dict[str, Any]:
         """Handle decompress_tokens tool call."""
         tokens = params["tokens"]
-        self._validate_tokens(tokens)
+        # Compressed/serialized tokens may contain string markers (e.g. <Dict>)
+        self._validate_tokens(tokens, allow_strings=True)
 
         start = time.perf_counter()
         restored = decompress(tokens)
