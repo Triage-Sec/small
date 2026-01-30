@@ -55,7 +55,9 @@ class MCPServer:
             response["result"] = result
         self._write(response)
 
-    def send_notification(self, method: str, params: dict[str, Any] | None = None) -> None:
+    def send_notification(
+        self, method: str, params: dict[str, Any] | None = None
+    ) -> None:
         """Send a JSON-RPC notification (no response expected)."""
         notification: dict[str, Any] = {"jsonrpc": "2.0", "method": method}
         if params:
@@ -67,7 +69,9 @@ class MCPServer:
         sys.stdout.write(json.dumps(message) + "\n")
         sys.stdout.flush()
 
-    def handle_initialize(self, request_id: int | str | None, params: dict[str, Any]) -> None:
+    def handle_initialize(
+        self, request_id: int | str | None, params: dict[str, Any]
+    ) -> None:
         """Handle the initialize request."""
         logger.info(
             "MCP client connected: %s",
@@ -92,7 +96,9 @@ class MCPServer:
         """Handle tools/list request."""
         self.send_response(request_id, {"tools": TOOL_DEFINITIONS})
 
-    def handle_tools_call(self, request_id: int | str | None, params: dict[str, Any]) -> None:
+    def handle_tools_call(
+        self, request_id: int | str | None, params: dict[str, Any]
+    ) -> None:
         """Handle tools/call request."""
         tool_name = params.get("name", "")
         tool_args = params.get("arguments", {})
@@ -187,8 +193,11 @@ class MCPServer:
         """Run the MCP server, reading from stdin."""
         logger.info("Small LTSC MCP server starting (version %s)", __version__)
         logger.info("Metrics: %s", self.config.metrics_path or "disabled")
-        logger.info("Max tokens: %d, Max text: %d chars", 
-                   self.config.max_input_tokens, self.config.max_text_length)
+        logger.info(
+            "Max tokens: %d, Max text: %d chars",
+            self.config.max_input_tokens,
+            self.config.max_text_length,
+        )
 
         for line in sys.stdin:
             line = line.strip()

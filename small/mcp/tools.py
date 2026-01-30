@@ -264,7 +264,9 @@ class ToolHandlers:
         self.config = config
         self.metrics = metrics
 
-    def _validate_tokens(self, tokens: list[int], max_tokens: int | None = None) -> None:
+    def _validate_tokens(
+        self, tokens: list[int], max_tokens: int | None = None
+    ) -> None:
         """Validate token input."""
         if not tokens:
             raise ValueError("tokens array cannot be empty")
@@ -322,7 +324,11 @@ class ToolHandlers:
         result = compress(tokens, config)
         elapsed_ms = (time.perf_counter() - start) * 1000
 
-        ratio = result.compressed_length / result.original_length if result.original_length else 1.0
+        ratio = (
+            result.compressed_length / result.original_length
+            if result.original_length
+            else 1.0
+        )
         savings = (1 - ratio) * 100
 
         # Record metrics
@@ -396,7 +402,11 @@ class ToolHandlers:
         result = compress(tokens, config)
         elapsed_ms = (time.perf_counter() - start) * 1000
 
-        ratio = result.compressed_length / result.original_length if result.original_length else 1.0
+        ratio = (
+            result.compressed_length / result.original_length
+            if result.original_length
+            else 1.0
+        )
         savings = (1 - ratio) * 100
 
         # Extract pattern info
@@ -435,7 +445,9 @@ class ToolHandlers:
             "potential_compressed_length": result.compressed_length,
             "potential_savings_percent": round(savings, 2),
             "patterns_detected": len(patterns),
-            "top_patterns": sorted(patterns, key=lambda p: p["length"], reverse=True)[:10],
+            "top_patterns": sorted(patterns, key=lambda p: p["length"], reverse=True)[
+                :10
+            ],
             "recommendation": recommendation,
             "time_ms": round(elapsed_ms, 2),
         }
@@ -624,7 +636,9 @@ class ToolHandlers:
             result = []
             while len(result) < n:
                 result.extend(pattern)
-                result.extend([random.choice(COMMON_TOKENS) for _ in range(random.randint(1, 3))])
+                result.extend(
+                    [random.choice(COMMON_TOKENS) for _ in range(random.randint(1, 3))]
+                )
             return result[:n]
 
         def gen_code(n: int) -> list[int]:
@@ -673,7 +687,9 @@ class ToolHandlers:
                     "avg_time_ms": round(avg_time, 2),
                     "min_time_ms": round(min(times), 2),
                     "max_time_ms": round(max(times), 2),
-                    "avg_savings_percent": round(sum(savings_list) / len(savings_list), 1),
+                    "avg_savings_percent": round(
+                        sum(savings_list) / len(savings_list), 1
+                    ),
                     "tokens_per_second": round((size / avg_time) * 1000, 0),
                 }
             )
@@ -683,7 +699,9 @@ class ToolHandlers:
             "results": results,
             "summary": {
                 "fastest": min(results, key=lambda r: r["avg_time_ms"])["name"],
-                "best_compression": max(results, key=lambda r: r["avg_savings_percent"])["name"],
+                "best_compression": max(
+                    results, key=lambda r: r["avg_savings_percent"]
+                )["name"],
             },
         }
 

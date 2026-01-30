@@ -41,7 +41,9 @@ class OperationMetrics:
 class SessionStats:
     """Accumulated statistics for the current MCP session."""
 
-    session_id: str = field(default_factory=lambda: datetime.now().strftime("%Y%m%d_%H%M%S"))
+    session_id: str = field(
+        default_factory=lambda: datetime.now().strftime("%Y%m%d_%H%M%S")
+    )
     session_start: str = field(default_factory=lambda: datetime.now().isoformat())
     total_operations: int = 0
     compress_operations: int = 0
@@ -155,7 +157,12 @@ class MetricsStore:
         with self._lock:
             self._operations.append(metrics)
 
-            if metrics.operation in ("compress", "compress_text", "compress_context", "analyze"):
+            if metrics.operation in (
+                "compress",
+                "compress_text",
+                "compress_context",
+                "analyze",
+            ):
                 self._session.record_compress(metrics)
             elif metrics.operation == "decompress":
                 self._session.record_decompress(metrics)
