@@ -14,7 +14,9 @@ class AnalysisConfig:
     clusters: int = 32
 
 
-def compute_document_weights(texts: list[str], provider: EmbeddingProvider, config: AnalysisConfig) -> list[float]:
+def compute_document_weights(
+    texts: list[str], provider: EmbeddingProvider, config: AnalysisConfig
+) -> list[float]:
     try:
         from sklearn.cluster import KMeans
     except ImportError as exc:

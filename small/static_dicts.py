@@ -24,8 +24,8 @@ _POLICY_PYTHON_V1 = StaticDictionary(
         "<SD_3>": ("rule.user", "==", "user"),
         "<SD_4>": ("rule.action", "==", "action"),
         "<SD_5>": ("rule.resource", "==", "resource:"),
-        "<SD_6>": ("rule.effect", "==", "\"allow\":"),
-        "<SD_7>": ("rule.effect", "==", "\"deny\":"),
+        "<SD_6>": ("rule.effect", "==", '"allow":'),
+        "<SD_7>": ("rule.effect", "==", '"deny":'),
     },
 )
 
@@ -43,12 +43,21 @@ def static_dictionary_marker(identifier: str, config: CompressionConfig) -> Toke
     return f"{config.static_dictionary_marker_prefix}{identifier}{config.static_dictionary_marker_suffix}"
 
 
-def parse_static_dictionary_marker(token: Token, config: CompressionConfig) -> str | None:
+def parse_static_dictionary_marker(
+    token: Token, config: CompressionConfig
+) -> str | None:
     if not isinstance(token, str):
         return None
-    if not (token.startswith(config.static_dictionary_marker_prefix) and token.endswith(config.static_dictionary_marker_suffix)):
+    if not (
+        token.startswith(config.static_dictionary_marker_prefix)
+        and token.endswith(config.static_dictionary_marker_suffix)
+    ):
         return None
-    return token[len(config.static_dictionary_marker_prefix) : -len(config.static_dictionary_marker_suffix)]
+    return token[
+        len(config.static_dictionary_marker_prefix) : -len(
+            config.static_dictionary_marker_suffix
+        )
+    ]
 
 
 def get_static_dictionary(identifier: str) -> StaticDictionary | None:

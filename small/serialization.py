@@ -24,12 +24,22 @@ def serialize(
     config: CompressionConfig,
     static_dictionary_id: str | None = None,
 ) -> SerializedOutput:
-    dictionary_tokens = build_dictionary_tokens(dictionary.meta_to_seq, config) if dictionary.meta_to_seq else []
+    dictionary_tokens = (
+        build_dictionary_tokens(dictionary.meta_to_seq, config)
+        if dictionary.meta_to_seq
+        else []
+    )
     if static_dictionary_id:
         marker = static_dictionary_marker(static_dictionary_id, config)
-        tokens = [marker] + (dictionary_tokens or [config.dict_start_token, config.dict_end_token]) + body_tokens
+        tokens = (
+            [marker]
+            + (dictionary_tokens or [config.dict_start_token, config.dict_end_token])
+            + body_tokens
+        )
     elif dictionary_tokens:
         tokens = dictionary_tokens + body_tokens
     else:
         tokens = list(body_tokens)
-    return SerializedOutput(tokens=tokens, dictionary_tokens=dictionary_tokens, body_tokens=body_tokens)
+    return SerializedOutput(
+        tokens=tokens, dictionary_tokens=dictionary_tokens, body_tokens=body_tokens
+    )

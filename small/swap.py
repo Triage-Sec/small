@@ -18,7 +18,9 @@ class SwapResult:
     meta_tokens_used: tuple[Token, ...]
 
 
-def perform_swaps(tokens: TokenSeq, candidates: Iterable[Candidate], config: CompressionConfig) -> SwapResult:
+def perform_swaps(
+    tokens: TokenSeq, candidates: Iterable[Candidate], config: CompressionConfig
+) -> SwapResult:
     replacements: dict[int, tuple[int, Token, tuple]] = {}
     dictionary_map: dict[Token, tuple[Token, ...]] = {}
     meta_tokens: list[Token] = []

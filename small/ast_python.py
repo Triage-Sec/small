@@ -29,7 +29,12 @@ def tokenize_source(source: str) -> list[TokenWithSpan]:
     tokens: list[TokenWithSpan] = []
     reader = StringIO(source).readline
     for tok in tokenize.generate_tokens(reader):
-        if tok.type in {tokenize.ENCODING, tokenize.NL, tokenize.NEWLINE, tokenize.ENDMARKER}:
+        if tok.type in {
+            tokenize.ENCODING,
+            tokenize.NL,
+            tokenize.NEWLINE,
+            tokenize.ENDMARKER,
+        }:
             continue
         tokens.append(
             TokenWithSpan(
@@ -45,17 +50,19 @@ def tokenize_source(source: str) -> list[TokenWithSpan]:
     return tokens
 
 
-def _node_key(node: ast.AST) -> tuple:
+def _node_key(node: ast.AST) -> tuple[object, ...]:
     if isinstance(node, ast.Name):
         return ("Name",)
     if isinstance(node, ast.Constant):
         return ("Const",)
     if isinstance(node, ast.arg):
         return ("arg",)
-    fields: list[tuple] = [node.__class__.__name__]
+    fields: list[object] = [node.__class__.__name__]
     for field, value in ast.iter_fields(node):
         if isinstance(value, list):
-            fields.append(tuple(_node_key(child) for child in value if isinstance(child, ast.AST)))
+            fields.append(
+                tuple(_node_key(child) for child in value if isinstance(child, ast.AST))
+            )
         elif isinstance(value, ast.AST):
             fields.append(_node_key(value))
         else:
@@ -74,12 +81,17 @@ def _node_span(node: ast.AST) -> TokenSpan | None:
     )
 
 
-def _find_token_range(tokens: list[TokenWithSpan], span: TokenSpan) -> tuple[int, int] | None:
+def _find_token_range(
+    tokens: list[TokenWithSpan], span: TokenSpan
+) -> tuple[int, int] | None:
     start_idx = None
     end_idx = None
     for idx, tok in enumerate(tokens):
         if start_idx is None:
-            if (tok.span.start_line, tok.span.start_col) >= (span.start_line, span.start_col):
+            if (tok.span.start_line, tok.span.start_col) >= (
+                span.start_line,
+                span.start_col,
+            ):
                 start_idx = idx
         if (tok.span.end_line, tok.span.end_col) <= (span.end_line, span.end_col):
             end_idx = idx
@@ -88,9 +100,11 @@ def _find_token_range(tokens: list[TokenWithSpan], span: TokenSpan) -> tuple[int
     return start_idx, end_idx + 1
 
 
-def discover_ast_candidates(source: str, config: CompressionConfig) -> tuple[list[Token], list[Candidate]]:
+def discover_ast_candidates(
+    source: str, config: CompressionConfig
+) -> tuple[list[Token], list[Candidate]]:
     tokens_with_spans = tokenize_source(source)
-    tokens = [tok.token for tok in tokens_with_spans]
+    tokens: list[Token] = [tok.token for tok in tokens_with_spans]
 
     try:
         tree = ast.parse(source)
@@ -117,7 +131,7 @@ def discover_ast_candidates(source: str, config: CompressionConfig) -> tuple[lis
             length = end - start
             if length < 2 or length > config.max_subsequence_length:
                 continue
-            subseq = tuple(tokens[start:end])
+            subseq: tuple[Token, ...] = tuple(tokens[start:end])
             candidates.setdefault(subseq, []).append(start)
 
     result: list[Candidate] = []

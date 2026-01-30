@@ -10,7 +10,9 @@ from .types import Candidate, Token, TokenSeq
 from .utils import is_compressible
 
 
-def _non_overlapping_positions(positions: Iterable[int], length: int) -> tuple[int, ...]:
+def _non_overlapping_positions(
+    positions: Iterable[int], length: int
+) -> tuple[int, ...]:
     selected: list[int] = []
     next_free = -1
     for pos in positions:
@@ -20,7 +22,9 @@ def _non_overlapping_positions(positions: Iterable[int], length: int) -> tuple[i
     return tuple(selected)
 
 
-def _discover_for_length(tokens: TokenSeq, length: int, extra_cost: int) -> list[Candidate]:
+def _discover_for_length(
+    tokens: TokenSeq, length: int, extra_cost: int
+) -> list[Candidate]:
     n = len(tokens)
     if length > n or length < 2:
         return []
@@ -45,7 +49,9 @@ def _discover_for_length(tokens: TokenSeq, length: int, extra_cost: int) -> list
     return candidates
 
 
-def discover_candidates(tokens: TokenSeq, max_length: int, config: CompressionConfig | None = None) -> list[Candidate]:
+def discover_candidates(
+    tokens: TokenSeq, max_length: int, config: CompressionConfig | None = None
+) -> list[Candidate]:
     min_length = config.min_subsequence_length if config else 2
     if max_length < min_length:
         return []
@@ -58,7 +64,9 @@ def discover_candidates(tokens: TokenSeq, max_length: int, config: CompressionCo
     return candidates
 
 
-def discover_candidates_chunked(tokens: TokenSeq, config: CompressionConfig) -> list[Candidate]:
+def discover_candidates_chunked(
+    tokens: TokenSeq, config: CompressionConfig
+) -> list[Candidate]:
     if config.chunk_size <= 0:
         return discover_candidates(tokens, config.max_subsequence_length, config)
     min_len = config.min_subsequence_length

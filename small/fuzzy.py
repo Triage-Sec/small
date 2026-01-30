@@ -15,7 +15,9 @@ def _hamming(a: tuple[Token, ...], b: tuple[Token, ...]) -> int:
     return sum(1 for x, y in zip(a, b) if x != y)
 
 
-def _patches(canonical: tuple[Token, ...], variant: tuple[Token, ...]) -> tuple[Patch, ...]:
+def _patches(
+    canonical: tuple[Token, ...], variant: tuple[Token, ...]
+) -> tuple[Patch, ...]:
     diffs: list[Patch] = []
     for idx, (left, right) in enumerate(zip(canonical, variant)):
         if left != right:
@@ -39,7 +41,9 @@ def _compression_savings(
     return original - (dict_cost + body_cost)
 
 
-def discover_fuzzy_candidates(tokens: TokenSeq, config: CompressionConfig) -> list[Candidate]:
+def discover_fuzzy_candidates(
+    tokens: TokenSeq, config: CompressionConfig
+) -> list[Candidate]:
     if not tokens:
         return []
     if not all(isinstance(tok, str) for tok in tokens):

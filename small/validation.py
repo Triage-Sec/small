@@ -16,9 +16,13 @@ def validate_config(config: CompressionConfig) -> list[ConfigWarning]:
     if config.min_subsequence_length < 2:
         raise ValueError("Minimum subsequence length must be >= 2.")
     if config.max_subsequence_length < config.min_subsequence_length:
-        raise ValueError("Maximum subsequence length must be >= minimum subsequence length.")
+        raise ValueError(
+            "Maximum subsequence length must be >= minimum subsequence length."
+        )
     if config.max_subsequence_length > 16:
-        warnings.append(ConfigWarning("Maximum subsequence length above 16 is rarely beneficial."))
+        warnings.append(
+            ConfigWarning("Maximum subsequence length above 16 is rarely beneficial.")
+        )
     if config.meta_token_pool_size <= 0:
         raise ValueError("Meta-token pool size must be positive.")
     if config.hierarchical_max_depth < 1:
@@ -27,7 +31,10 @@ def validate_config(config: CompressionConfig) -> list[ConfigWarning]:
         raise ValueError("Selection mode must be one of: greedy, optimal, beam.")
     if config.selection_mode == "beam" and config.beam_width < 1:
         raise ValueError("Beam width must be >= 1.")
-    if config.static_dictionary_min_confidence < 0 or config.static_dictionary_min_confidence > 1:
+    if (
+        config.static_dictionary_min_confidence < 0
+        or config.static_dictionary_min_confidence > 1
+    ):
         raise ValueError("Static dictionary min confidence must be between 0 and 1.")
     if config.fuzzy_max_diff < 0:
         raise ValueError("Fuzzy max diff must be >= 0.")

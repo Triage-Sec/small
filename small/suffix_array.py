@@ -16,6 +16,7 @@ class SuffixArray:
 
 def _rank_tokens(tokens: Iterable[Token]) -> list[int]:
     values = list(tokens)
+
     def sort_key(value: Token) -> tuple[str, str]:
         return (type(value).__name__, repr(value))
 

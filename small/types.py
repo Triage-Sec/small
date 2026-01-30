@@ -46,7 +46,11 @@ class CompressionResult:
     def verify(self, original_tokens: TokenSeq | None, config) -> None:
         from .compressor import decompress
 
-        target = list(original_tokens) if original_tokens is not None else list(self.original_tokens)
+        target = (
+            list(original_tokens)
+            if original_tokens is not None
+            else list(self.original_tokens)
+        )
         restored = decompress(self.serialized_tokens, config)
         if list(restored) != target:
             raise ValueError("Round-trip verification failed.")

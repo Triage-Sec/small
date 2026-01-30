@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import Sequence
+from typing import Any, Mapping, Sequence
 
 from .config import CompressionConfig
 from .dictionary import build_body_tokens
@@ -30,13 +30,13 @@ from .utils import (
 
 def _apply_static_dictionary(
     tokens: list[Token],
-    static_dict: dict[Token, tuple[Token, ...]],
+    static_dict: Mapping[Token, tuple[Token, ...]],
     config: CompressionConfig,
-) -> tuple[list[Token], dict[int, tuple[int, Token, tuple]]]:
+) -> tuple[list[Token], dict[int, tuple[int, Token, tuple[Any, ...]]]]:
     if any(token in static_dict for token in tokens):
         raise ValueError("Input sequence contains static meta-tokens.")
     occupied = [False] * len(tokens)
-    replacements: dict[int, tuple[int, Token, tuple]] = {}
+    replacements: dict[int, tuple[int, Token, tuple[Any, ...]]] = {}
     entries = sorted(static_dict.items(), key=lambda item: len(item[1]), reverse=True)
     for meta, subseq in entries:
         if len(subseq) < config.static_dictionary_min_length:
@@ -58,13 +58,18 @@ def _apply_static_dictionary(
     return build_body_tokens(tokens, replacements, config), replacements
 
 
-def _select_static_dictionary(tokens: list[Token], config: CompressionConfig) -> str | None:
+def _select_static_dictionary(
+    tokens: list[Token], config: CompressionConfig
+) -> str | None:
     if config.static_dictionary_id:
         return config.static_dictionary_id
     if not config.static_dictionary_auto:
         return None
     detection = detect_domain(tokens, config)
-    if detection.domain is None or detection.confidence < config.static_dictionary_min_confidence:
+    if (
+        detection.domain is None
+        or detection.confidence < config.static_dictionary_min_confidence
+    ):
         return None
     return DOMAIN_TO_STATIC_ID.get(detection.domain)
 
@@ -79,14 +84,16 @@ def _compress_internal(
 
     working_tokens = list(tokens)
     static_id = _select_static_dictionary(working_tokens, cfg)
-    static_dict = None
-    static_replacements: dict[int, tuple[int, Token, tuple]] = {}
+    static_dict: Mapping[Token, tuple[Token, ...]] | None = None
+    static_replacements: dict[int, tuple[int, Token, tuple[Any, ...]]] = {}
     if static_id:
         static_entry = get_static_dictionary(static_id)
         if static_entry is None:
             raise ValueError("Unknown static dictionary id.")
         static_dict = static_entry.entries
-        working_tokens, static_replacements = _apply_static_dictionary(working_tokens, static_dict, cfg)
+        working_tokens, static_replacements = _apply_static_dictionary(
+            working_tokens, static_dict, cfg
+        )
 
     engine = default_engine(cfg)
     if preferred_candidates:
@@ -95,14 +102,18 @@ def _compress_internal(
             name = "preferred"
 
             def discover(self, tokens: TokenSeq, config: CompressionConfig) -> list:
-                return preferred_candidates
+                return preferred_candidates or []
 
-        engine = CompressionEngine((_PreferredStage(),) + engine.discovery_stages)
+        engine = CompressionEngine((_PreferredStage(),) + engine.discovery_stages)  # type: ignore[arg-type]
 
     working_tokens, dictionary_map = engine.compress_tokens(working_tokens, cfg)
 
     body_tokens = working_tokens
-    dictionary = CompressionDictionary(meta_to_seq=dict(dictionary_map), seq_to_meta={}, max_entries=cfg.meta_token_pool_size)
+    dictionary = CompressionDictionary(
+        meta_to_seq=dict(dictionary_map),
+        seq_to_meta={},
+        max_entries=cfg.meta_token_pool_size,
+    )
     for meta, subseq in dictionary_map.items():
         dictionary.seq_to_meta[subseq] = meta
     serialized = serialize(dictionary, body_tokens, cfg, static_dictionary_id=static_id)
@@ -114,7 +125,9 @@ def _compress_internal(
         dictionary_tokens = []
         body_tokens = list(tokens)
         dictionary_map = {}
-        dictionary = CompressionDictionary(meta_to_seq={}, seq_to_meta={}, max_entries=cfg.meta_token_pool_size)
+        dictionary = CompressionDictionary(
+            meta_to_seq={}, seq_to_meta={}, max_entries=cfg.meta_token_pool_size
+        )
         static_id = None
     else:
         serialized_tokens = serialized.tokens
@@ -145,9 +158,9 @@ def _compress_internal(
                 task_type=predictor.task_type,
                 conservative=True,
             )
-        
+
         prediction = predictor.predict(tokens, initial_result)
-        
+
         if prediction.predicted_degradation > cfg.max_predicted_degradation:
             # Quality risk too high - try with conservative settings or return original
             if prediction.recommendation == "partial" and len(dictionary_map) > 0:
@@ -160,7 +173,9 @@ def _compress_internal(
                         "enable_quality_prediction": False,  # Don't recurse
                     }
                 )
-                return _compress_internal(tokens, conservative_cfg, preferred_candidates)
+                return _compress_internal(
+                    tokens, conservative_cfg, preferred_candidates
+                )
             elif prediction.recommendation == "skip":
                 # Return original tokens (no compression)
                 return CompressionResult(
@@ -174,7 +189,11 @@ def _compress_internal(
                     original_length=len(tokens),
                     compressed_length=len(tokens),
                     static_dictionary_id=None,
-                    dictionary=CompressionDictionary(meta_to_seq={}, seq_to_meta={}, max_entries=cfg.meta_token_pool_size),
+                    dictionary=CompressionDictionary(
+                        meta_to_seq={},
+                        seq_to_meta={},
+                        max_entries=cfg.meta_token_pool_size,
+                    ),
                 )
 
     result = CompressionResult(
@@ -210,7 +229,9 @@ def _compress_internal(
             if hasattr(cfg.cache_stats_source, "stats"):
                 cache_stats = cfg.cache_stats_source.stats()
         if cfg.combined_metrics_jsonl_path and cache_stats:
-            write_combined_metrics_jsonl(cfg.combined_metrics_jsonl_path, metrics, cache_stats)
+            write_combined_metrics_jsonl(
+                cfg.combined_metrics_jsonl_path, metrics, cache_stats
+            )
 
     if cfg.verify:
         result.verify(tokens, cfg)
@@ -218,14 +239,24 @@ def _compress_internal(
     return result
 
 
-def compress(tokens: TokenSeq, config: CompressionConfig | None = None) -> CompressionResult:
+def compress(
+    tokens: TokenSeq, config: CompressionConfig | None = None
+) -> CompressionResult:
     cfg = config or CompressionConfig()
     return _compress_internal(tokens, cfg, preferred_candidates=None)
 
 
-def compress_python_source(source: str, config: CompressionConfig | None = None) -> tuple[list[Token], CompressionResult]:
+def compress_python_source(
+    source: str, config: CompressionConfig | None = None
+) -> tuple[list[Token], CompressionResult]:
     cfg = config or CompressionConfig()
-    tokens, ast_candidates = discover_ast_candidates(source, cfg) if cfg.ast_enabled else (source.split(), [])
+    tokens: list[Token]
+    ast_candidates: list[Any]
+    if cfg.ast_enabled:
+        tokens, ast_candidates = discover_ast_candidates(source, cfg)
+    else:
+        tokens = list(source.split())
+        ast_candidates = []
     result = _compress_internal(tokens, cfg, preferred_candidates=ast_candidates)
     return tokens, result
 
@@ -247,7 +278,9 @@ def _expand_token(
     return expanded
 
 
-def decompress(tokens: Sequence[Token], config: CompressionConfig | None = None) -> list[Token]:
+def decompress(
+    tokens: Sequence[Token], config: CompressionConfig | None = None
+) -> list[Token]:
     cfg = config or CompressionConfig()
     if not tokens:
         return []
@@ -262,13 +295,17 @@ def decompress(tokens: Sequence[Token], config: CompressionConfig | None = None)
         idx = 1
     if idx >= len(tokens) or tokens[idx] != cfg.dict_start_token:
         if static_dict:
-            raise ValueError("Compressed sequence does not start with dictionary delimiter.")
+            raise ValueError(
+                "Compressed sequence does not start with dictionary delimiter."
+            )
         return list(tokens)
 
     try:
         end_idx = tokens.index(cfg.dict_end_token, idx + 1)
     except ValueError as exc:
-        raise ValueError("Compressed sequence missing dictionary end delimiter.") from exc
+        raise ValueError(
+            "Compressed sequence missing dictionary end delimiter."
+        ) from exc
 
     dict_tokens = tokens[idx + 1 : end_idx]
     body_tokens = tokens[end_idx + 1 :]
@@ -311,10 +348,10 @@ def decompress(tokens: Sequence[Token], config: CompressionConfig | None = None)
         if not subseq:
             raise ValueError("Empty dictionary entry for meta-token.")
 
-    for meta, subseq in static_dict.items():
-        if meta in dictionary_map:
+    for static_meta, static_subseq in static_dict.items():
+        if static_meta in dictionary_map:
             raise ValueError("Static and dynamic dictionaries share a meta-token.")
-        dictionary_map[meta] = list(subseq)
+        dictionary_map[static_meta] = list(static_subseq)
 
     decoded: list[Token] = []
     memo: dict[Token, list[Token]] = {}
@@ -322,10 +359,15 @@ def decompress(tokens: Sequence[Token], config: CompressionConfig | None = None)
     while idx < len(body_tokens):
         token = body_tokens[idx]
         if token in dictionary_map:
-            if idx + 1 < len(body_tokens) and body_tokens[idx + 1] == cfg.patch_start_token:
+            if (
+                idx + 1 < len(body_tokens)
+                and body_tokens[idx + 1] == cfg.patch_start_token
+            ):
                 idx += 2
                 patches: list[tuple[int, Token]] = []
-                while idx < len(body_tokens) and body_tokens[idx] != cfg.patch_end_token:
+                while (
+                    idx < len(body_tokens) and body_tokens[idx] != cfg.patch_end_token
+                ):
                     patch_index = parse_patch_index_token(body_tokens[idx], cfg)
                     if idx + 1 >= len(body_tokens):
                         raise ValueError("Patch entry missing replacement token.")
@@ -356,7 +398,9 @@ def decompress_with_dictionary(
     config: CompressionConfig | None = None,
 ) -> list[Token]:
     cfg = config or CompressionConfig()
-    dictionary_map: dict[Token, list[Token]] = {meta: list(seq) for meta, seq in dictionary.items()}
+    dictionary_map: dict[Token, list[Token]] = {
+        meta: list(seq) for meta, seq in dictionary.items()
+    }
     decoded: list[Token] = []
     memo: dict[Token, list[Token]] = {}
     idx = 0

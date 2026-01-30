@@ -7,6 +7,7 @@ from typing import Iterable
 
 from .config import CompressionConfig
 
+
 @dataclass(frozen=True)
 class VocabExtension:
     meta_tokens: list[str]
@@ -14,7 +15,10 @@ class VocabExtension:
 
 
 def build_meta_tokens(config: CompressionConfig) -> list[str]:
-    return [f"{config.meta_token_prefix}{i}{config.meta_token_suffix}" for i in range(config.meta_token_pool_size)]
+    return [
+        f"{config.meta_token_prefix}{i}{config.meta_token_suffix}"
+        for i in range(config.meta_token_pool_size)
+    ]
 
 
 def build_special_tokens(config: CompressionConfig) -> list[str]:
@@ -25,7 +29,9 @@ def build_special_tokens(config: CompressionConfig) -> list[str]:
         tokens.extend([config.patch_start_token, config.patch_end_token])
         tokens.append(f"{config.patch_index_prefix}0{config.patch_index_suffix}")
     if config.static_dictionary_id or config.static_dictionary_auto:
-        tokens.append(f"{config.static_dictionary_marker_prefix}example{config.static_dictionary_marker_suffix}")
+        tokens.append(
+            f"{config.static_dictionary_marker_prefix}example{config.static_dictionary_marker_suffix}"
+        )
     return tokens
 
 

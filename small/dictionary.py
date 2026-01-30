@@ -36,7 +36,9 @@ def order_dictionary_entries(
     return ordered
 
 
-def build_dictionary_tokens(dictionary_map: dict[Token, tuple[Token, ...]], config: CompressionConfig) -> list[Token]:
+def build_dictionary_tokens(
+    dictionary_map: dict[Token, tuple[Token, ...]], config: CompressionConfig
+) -> list[Token]:
     tokens: list[Token] = [config.dict_start_token]
     for meta_token in order_dictionary_entries(dictionary_map, config):
         subseq = dictionary_map[meta_token]

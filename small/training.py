@@ -66,7 +66,9 @@ def generate_training_examples(
     examples: list[TrainingExample] = []
     for prompt_tokens, output_tokens in samples:
         compress_prompt = rng.random() < compress_ratio
-        examples.append(build_example(prompt_tokens, output_tokens, config, compress_prompt))
+        examples.append(
+            build_example(prompt_tokens, output_tokens, config, compress_prompt)
+        )
     return examples
 
 
@@ -76,7 +78,11 @@ def build_curriculum(base_config: CompressionConfig) -> list[CurriculumStage]:
         CurriculumStage(
             name="baseline",
             config=CompressionConfig(
-                **{**base_config.__dict__, "hierarchical_enabled": False, "max_subsequence_length": 4}
+                **{
+                    **base_config.__dict__,
+                    "hierarchical_enabled": False,
+                    "max_subsequence_length": 4,
+                }
             ),
             compress_ratio=0.4,
         )

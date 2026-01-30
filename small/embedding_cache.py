@@ -16,7 +16,9 @@ def _normalize_text(text: str) -> str:
     return unicodedata.normalize("NFC", text.strip())
 
 
-def cache_key(provider: str, model_id: str, text: str, dimensions: int | None, version: int) -> str:
+def cache_key(
+    provider: str, model_id: str, text: str, dimensions: int | None, version: int
+) -> str:
     normalized = _normalize_text(text)
     raw = f"{provider}|{model_id}|{normalized}|{dimensions}|{version}"
     return hashlib.sha256(raw.encode("utf-8")).hexdigest()
@@ -67,7 +69,11 @@ class SQLiteEmbeddingCache:
         self.config = config
         Path(self.config.path).parent.mkdir(parents=True, exist_ok=True)
         self.conn = sqlite3.connect(self.config.path)
-        self.conn.execute("PRAGMA journal_mode=WAL;" if self.config.wal_mode else "PRAGMA journal_mode=DELETE;")
+        self.conn.execute(
+            "PRAGMA journal_mode=WAL;"
+            if self.config.wal_mode
+            else "PRAGMA journal_mode=DELETE;"
+        )
         self._init_schema()
         self._init_meta()
 
@@ -85,8 +91,12 @@ class SQLiteEmbeddingCache:
             );
             """
         )
-        self.conn.execute("CREATE INDEX IF NOT EXISTS idx_model_id ON embeddings(model_id);")
-        self.conn.execute("CREATE INDEX IF NOT EXISTS idx_last_accessed ON embeddings(last_accessed);")
+        self.conn.execute(
+            "CREATE INDEX IF NOT EXISTS idx_model_id ON embeddings(model_id);"
+        )
+        self.conn.execute(
+            "CREATE INDEX IF NOT EXISTS idx_last_accessed ON embeddings(last_accessed);"
+        )
         self.conn.execute(
             """
             CREATE TABLE IF NOT EXISTS cache_meta (
@@ -112,7 +122,9 @@ class SQLiteEmbeddingCache:
         self.conn.commit()
 
     def _bump_meta(self, key: str, delta: int = 1) -> None:
-        row = self.conn.execute("SELECT value FROM cache_meta WHERE key = ?;", (key,)).fetchone()
+        row = self.conn.execute(
+            "SELECT value FROM cache_meta WHERE key = ?;", (key,)
+        ).fetchone()
         current = int(row[0]) if row else 0
         self.conn.execute(
             "INSERT OR REPLACE INTO cache_meta(key, value) VALUES (?, ?);",
@@ -183,7 +195,9 @@ class SQLiteEmbeddingCache:
         if not rows:
             return
         keys = [row[0] for row in rows]
-        self.conn.executemany("DELETE FROM embeddings WHERE cache_key = ?;", [(k,) for k in keys])
+        self.conn.executemany(
+            "DELETE FROM embeddings WHERE cache_key = ?;", [(k,) for k in keys]
+        )
         self._bump_meta("evictions", len(keys))
         self.conn.commit()
 
@@ -196,7 +210,12 @@ class SQLiteEmbeddingCache:
 
 
 class RedisEmbeddingCache:
-    def __init__(self, config: RedisCacheConfig, compression: str = "zstd", precision: str = "float32") -> None:
+    def __init__(
+        self,
+        config: RedisCacheConfig,
+        compression: str = "zstd",
+        precision: str = "float32",
+    ) -> None:
         try:
             import redis
         except ImportError as exc:
@@ -227,7 +246,10 @@ class RedisEmbeddingCache:
             self._redis.hincrby(self._stats_key, "misses", 1)
             return None
         self._redis.hincrby(self._stats_key, "hits", 1)
-        return self._deserialize(data, dimension)
+        # Redis sync client returns bytes, cast for type checker
+        return self._deserialize(
+            data if isinstance(data, bytes) else bytes(str(data), "utf-8"), dimension
+        )
 
     def set(self, key: str, vector: list[float]) -> None:
         ttl = None
@@ -240,4 +262,7 @@ class RedisEmbeddingCache:
         data = self._redis.hgetall(self._stats_key)
         if not data:
             return {"sets": 0, "hits": 0, "misses": 0}
-        return {k.decode("utf-8"): int(v) for k, v in data.items()}
+        result: dict[str, int] = {}
+        for k, v in dict(data).items():  # type: ignore[arg-type]
+            result[k.decode("utf-8")] = int(v)
+        return result

@@ -8,6 +8,7 @@ from typing import Iterable, Iterator
 
 from .corpus import CorpusDocument
 from .tokenizer import TokenizerAdapter
+from .types import Token
 
 
 @dataclass(frozen=True)
@@ -25,7 +26,7 @@ def preprocess_corpus(
     docs: Iterable[CorpusDocument],
     tokenizer: TokenizerAdapter,
     config: PreprocessConfig,
-) -> Iterator[tuple[CorpusDocument, list[int] | list[str]]]:
+) -> Iterator[tuple[CorpusDocument, list[Token]]]:
     seen: set[str] = set()
     for doc in docs:
         if config.deduplicate:

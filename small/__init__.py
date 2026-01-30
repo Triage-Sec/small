@@ -14,7 +14,12 @@ Example:
 __version__ = "0.2.0"
 
 # Core compression API
-from .compressor import compress, compress_python_source, decompress, decompress_with_dictionary
+from .compressor import (
+    compress,
+    compress_python_source,
+    decompress,
+    decompress_with_dictionary,
+)
 from .config import CompressionConfig
 from .engine import CompressionEngine, default_engine
 from .types import CompressionResult, Candidate, Occurrence
@@ -59,7 +64,12 @@ from .quality_predictor import (
 )
 
 # Training utilities
-from .training import TrainingExample, build_example, build_curriculum, generate_training_examples
+from .training import (
+    TrainingExample,
+    build_example,
+    build_curriculum,
+    generate_training_examples,
+)
 from .vocab import VocabExtension, plan_vocab_extension
 
 # Corpus management

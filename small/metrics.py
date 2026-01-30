@@ -24,7 +24,9 @@ class CompressionMetrics:
     depth_utilization: dict[int, int]
 
 
-def _depths(dictionary_map: dict[Token, tuple[Token, ...]], config: CompressionConfig) -> dict[Token, int]:
+def _depths(
+    dictionary_map: dict[Token, tuple[Token, ...]], config: CompressionConfig
+) -> dict[Token, int]:
     depths: dict[Token, int] = {}
 
     def depth(meta: Token) -> int:
@@ -49,7 +51,11 @@ def compute_metrics(
     candidates_discovered: int,
     config: CompressionConfig,
 ) -> CompressionMetrics:
-    compression_amount = (original_length - compressed_length) / original_length if original_length else 0.0
+    compression_amount = (
+        (original_length - compressed_length) / original_length
+        if original_length
+        else 0.0
+    )
     compression_ratio = compressed_length / original_length if original_length else 1.0
     effective_savings = original_length - compressed_length
 

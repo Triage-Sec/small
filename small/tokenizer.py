@@ -3,23 +3,19 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Iterable, Protocol
+from typing import Any, Iterable, Protocol
 
 from .types import Token
 
 
 class TokenizerAdapter(Protocol):
-    def encode(self, text: str) -> list[Token]:
-        ...
+    def encode(self, text: str) -> list[Token]: ...
 
-    def decode(self, tokens: Iterable[Token]) -> str:
-        ...
+    def decode(self, tokens: Iterable[Token]) -> str: ...
 
-    def vocab_size(self) -> int:
-        ...
+    def vocab_size(self) -> int: ...
 
-    def is_special_token(self, token: Token) -> bool:
-        ...
+    def is_special_token(self, token: Token) -> bool: ...
 
 
 @dataclass
@@ -39,7 +35,7 @@ class SimpleWhitespaceTokenizer:
 
 @dataclass
 class HuggingFaceTokenizerAdapter:
-    tokenizer: object
+    tokenizer: Any
 
     def encode(self, text: str) -> list[int]:
         return list(self.tokenizer.encode(text))
@@ -52,14 +48,17 @@ class HuggingFaceTokenizerAdapter:
 
     def is_special_token(self, token: int) -> bool:
         try:
-            return bool(self.tokenizer.convert_ids_to_tokens([token])[0] in self.tokenizer.all_special_tokens)
+            return bool(
+                self.tokenizer.convert_ids_to_tokens([token])[0]
+                in self.tokenizer.all_special_tokens
+            )
         except Exception:
             return False
 
 
 @dataclass
 class TiktokenAdapter:
-    encoder: object
+    encoder: Any
 
     def encode(self, text: str) -> list[int]:
         return list(self.encoder.encode(text))
@@ -78,7 +77,7 @@ class TiktokenAdapter:
 
 @dataclass
 class SentencePieceAdapter:
-    processor: object
+    processor: Any
 
     def encode(self, text: str) -> list[int]:
         return list(self.processor.encode(text, out_type=int))

@@ -29,7 +29,13 @@ def embed_with_cache(
     vectors: list[list[float]] = []
     for text in texts:
         if cache and config.cache_enabled:
-            key = cache_key(type(provider).__name__, provider.model_id(), text, dimensions, config.cache_key_version)
+            key = cache_key(
+                type(provider).__name__,
+                provider.model_id(),
+                text,
+                dimensions,
+                config.cache_key_version,
+            )
             cached = cache.get(key)
             if cached is not None:
                 vectors.append(cached)
@@ -55,6 +61,7 @@ def run_offline_analysis(
         return []
 
     vectors = embed_with_cache(provider, texts, cache, pipeline_config)
+
     # Temporarily wrap provider with fixed embeddings
     class _Provider:
         def __init__(self, vecs):
@@ -69,7 +76,7 @@ def run_offline_analysis(
         def normalize(self):
             return provider.normalize()
 
-    weights = compute_document_weights(texts, _Provider(vectors), analysis_config)
+    weights = compute_document_weights(texts, _Provider(vectors), analysis_config)  # type: ignore[arg-type]
     if cache:
         stats = cache.stats()
         log_cache_stats(stats)

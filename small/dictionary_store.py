@@ -19,14 +19,18 @@ class CompressionDictionary:
     def empty(cls, max_entries: int) -> "CompressionDictionary":
         return cls(meta_to_seq={}, seq_to_meta={}, max_entries=max_entries)
 
-    def add_entry(self, meta: Token, subseq: tuple[Token, ...], config: CompressionConfig) -> None:
+    def add_entry(
+        self, meta: Token, subseq: tuple[Token, ...], config: CompressionConfig
+    ) -> None:
         if len(self.meta_to_seq) >= self.max_entries:
             raise ValueError("Dictionary size limit exceeded.")
         if meta in self.meta_to_seq:
             raise ValueError("Meta-token already exists in dictionary.")
         if subseq in self.seq_to_meta:
             raise ValueError("Subsequence already mapped to a meta-token.")
-        if any(is_meta_token(tok, config) and tok not in self.meta_to_seq for tok in subseq):
+        if any(
+            is_meta_token(tok, config) and tok not in self.meta_to_seq for tok in subseq
+        ):
             raise ValueError("Subsequence references undefined meta-token.")
         self.meta_to_seq[meta] = subseq
         self.seq_to_meta[subseq] = meta

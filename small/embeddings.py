@@ -7,23 +7,17 @@ from typing import Protocol
 
 
 class EmbeddingProvider(Protocol):
-    def embed_single(self, text: str) -> list[float]:
-        ...
+    def embed_single(self, text: str) -> list[float]: ...
 
-    def embed_batch(self, texts: list[str]) -> list[list[float]]:
-        ...
+    def embed_batch(self, texts: list[str]) -> list[list[float]]: ...
 
-    def dimension(self) -> int:
-        ...
+    def dimension(self) -> int: ...
 
-    def max_tokens(self) -> int:
-        ...
+    def max_tokens(self) -> int: ...
 
-    def normalize(self) -> bool:
-        ...
+    def normalize(self) -> bool: ...
 
-    def model_id(self) -> str:
-        ...
+    def model_id(self) -> str: ...
 
 
 @dataclass
@@ -62,11 +56,14 @@ class HuggingFaceEmbeddingProvider:
         return list(self._model.encode([text], normalize_embeddings=True)[0])
 
     def embed_batch(self, texts: list[str]) -> list[list[float]]:
-        vectors = self._model.encode(texts, batch_size=self.batch_size, normalize_embeddings=True)
+        vectors = self._model.encode(
+            texts, batch_size=self.batch_size, normalize_embeddings=True
+        )
         return [list(vec) for vec in vectors]
 
     def dimension(self) -> int:
-        return int(self._model.get_sentence_embedding_dimension())
+        dim = self._model.get_sentence_embedding_dimension()
+        return int(dim) if dim is not None else 0
 
     def max_tokens(self) -> int:
         return 8192
@@ -93,7 +90,9 @@ class OllamaEmbeddingProvider:
 
     def embed_single(self, text: str) -> list[float]:
         with self._client() as client:
-            response = client.post("/api/embeddings", json={"model": self.model, "prompt": text})
+            response = client.post(
+                "/api/embeddings", json={"model": self.model, "prompt": text}
+            )
             response.raise_for_status()
             return list(response.json()["embedding"])
 
@@ -128,12 +127,16 @@ class OpenAIEmbeddingProvider:
 
     def embed_single(self, text: str) -> list[float]:
         client = self._client()
-        response = client.embeddings.create(model=self.model, input=[text], dimensions=self.dimensions)
+        response = client.embeddings.create(
+            model=self.model, input=[text], dimensions=self.dimensions
+        )
         return list(response.data[0].embedding)
 
     def embed_batch(self, texts: list[str]) -> list[list[float]]:
         client = self._client()
-        response = client.embeddings.create(model=self.model, input=texts, dimensions=self.dimensions)
+        response = client.embeddings.create(
+            model=self.model, input=texts, dimensions=self.dimensions
+        )
         return [list(item.embedding) for item in response.data]
 
     def dimension(self) -> int:
