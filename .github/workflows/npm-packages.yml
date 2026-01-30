@@ -184,17 +184,20 @@ jobs:
             npm install
             npm run build
   
-        - name: Install and build ML
-          working-directory: packages/ml
-          run: |
-            npm install
-            npm run build
-  
         - name: Publish SDK
           working-directory: packages/sdk
           run: npm publish --access public
           env:
             NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+        - name: Wait for npm registry propagation
+          run: sleep 15
+  
+        - name: Install and build ML
+          working-directory: packages/ml
+          run: |
+            npm install
+            npm run build
   
         - name: Publish ML
           working-directory: packages/ml
