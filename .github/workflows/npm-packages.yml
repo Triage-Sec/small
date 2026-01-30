@@ -109,6 +109,7 @@ jobs:
 
   test-ml:
     name: ML Package Tests
+    needs: build-wasm
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -121,9 +122,24 @@ jobs:
         with:
           node-version: ${{ matrix.node-version }}
 
-      - name: Install ML dependencies
+      - name: Download WASM artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: wasm-pkg
+          path: packages/sdk/src/wasm
+
+      - name: Install and build SDK first (peer dependency)
+        working-directory: packages/sdk
+        run: |
+          npm install
+          npm run build
+          npm link
+
+      - name: Install ML dependencies with linked SDK
         working-directory: packages/ml
-        run: npm install
+        run: |
+          npm link @small-ltsc/sdk
+          npm install --legacy-peer-deps
 
       - name: Build ML package
         working-directory: packages/ml
