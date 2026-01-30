@@ -245,7 +245,13 @@ class TestToolHandlers:
 
         assert "compressed_tokens" in result
         assert "cost_estimate" in result
-        assert "gpt4_input_saved_usd" in result["cost_estimate"]
+        assert "estimated_input_saved_usd" in result["cost_estimate"]
+
+        saved = result["cost_estimate"]["estimated_input_saved_usd"]
+        assert "gpt-5.2-thinking" in saved
+        assert "gemini-3.0-pro" in saved
+        assert "gemini-3.0-flash" in saved
+        assert "claude-opus-4.5" in saved
 
     def test_compress_context_preserve_recent(self, handlers: ToolHandlers) -> None:
         """Test context compression with preserved recent tokens."""
