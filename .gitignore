@@ -20,4 +20,4 @@ packages/sdk/src/wasm/pkg-web/
 .idea/
 .vscode/
 *.swp
-*.swo
+*.swo.venv
