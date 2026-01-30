@@ -40,6 +40,7 @@ pip install small-ltsc
 # With optional dependencies
 pip install "small-ltsc[analysis]"   # ML analysis tools
 pip install "small-ltsc[training]"   # Fine-tuning utilities
+pip install "small-ltsc[mcp]"        # MCP server for AI assistants
 pip install "small-ltsc[all]"        # Everything
 ```
 
@@ -229,19 +230,22 @@ pip install "small-ltsc[mcp]"
 small-mcp
 ```
 
-Configure in Cursor/Claude Desktop (`~/.cursor/mcp.json`):
+Configure in Cursor/Claude Desktop (`~/.cursor/mcp.json`). Prefer **absolute paths** (GUI apps often don't inherit your shell `PATH`):
 
 ```json
 {
   "mcpServers": {
     "small-ltsc": {
-      "command": "small-mcp"
+      "command": "/path/to/venv/bin/python",
+      "args": ["-m", "small.mcp"]
     }
   }
 }
 ```
 
-See [MCP Documentation](docs/mcp.md) for full setup guide and available tools.
+If you see `spawn small-mcp ENOENT`, use an absolute path to your environment's `python` (or `small-mcp`).
+
+See [MCP Documentation](docs/mcp.md) for a full setup guide and available tools.
 
 ## Architecture
 

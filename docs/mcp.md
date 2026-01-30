@@ -17,32 +17,26 @@ pip install "small-ltsc[all,mcp]"
 ### Running the Server
 
 ```bash
-# Via command line
-small-mcp
-
-# Or via Python module
+# Preferred (works reliably with venvs):
 python -m small.mcp
+
+# If `small-mcp` is on PATH (pip console script):
+small-mcp
 ```
 
 The server communicates via stdio (JSON-RPC over stdin/stdout), which is the standard MCP transport.
+
+Note: On macOS, GUI apps often **don't inherit your shell PATH**. If your client logs show
+`spawn small-mcp ENOENT`, configure the server with an **absolute path** to your Python
+interpreter (or to `small-mcp`).
 
 ## Client Configuration
 
 ### Cursor
 
-Add to your Cursor settings (`~/.cursor/mcp.json` or workspace `.cursor/mcp.json`):
+Add to your Cursor settings (`~/.cursor/mcp.json` or workspace `.cursor/mcp.json`).
 
-```json
-{
-  "mcpServers": {
-    "small-ltsc": {
-      "command": "small-mcp"
-    }
-  }
-}
-```
-
-Or with a specific Python environment:
+Recommended configuration (absolute `python` path):
 
 ```json
 {
@@ -50,6 +44,18 @@ Or with a specific Python environment:
     "small-ltsc": {
       "command": "/path/to/venv/bin/python",
       "args": ["-m", "small.mcp"]
+    }
+  }
+}
+```
+
+If you installed to a location already on PATH, this also works:
+
+```json
+{
+  "mcpServers": {
+    "small-ltsc": {
+      "command": "small-mcp"
     }
   }
 }
@@ -63,7 +69,8 @@ Add to your Claude Desktop config (`~/Library/Application Support/Claude/claude_
 {
   "mcpServers": {
     "small-ltsc": {
-      "command": "small-mcp"
+      "command": "/path/to/venv/bin/python",
+      "args": ["-m", "small.mcp"]
     }
   }
 }
@@ -77,7 +84,8 @@ Add to Windsurf MCP configuration:
 {
   "mcpServers": {
     "small-ltsc": {
-      "command": "small-mcp"
+      "command": "/path/to/venv/bin/python",
+      "args": ["-m", "small.mcp"]
     }
   }
 }
@@ -152,6 +160,12 @@ Compress an LLM context window with optional preservation of recent tokens.
 - `preserve_recent`: Tokens to keep uncompressed (default: 0)
 
 **Returns:** Compressed tokens, cost estimates, timing
+
+Cost estimates are input-token savings for these models (pricing as of 2026-01-30):
+- GPT-5.2 Thinking (`gpt-5.2-thinking`)
+- Gemini 3.0 Pro (`gemini-3.0-pro`)
+- Gemini 3.0 Flash (`gemini-3.0-flash`)
+- Claude Opus 4.5 (`claude-opus-4.5`)
 
 ### get_session_metrics
 

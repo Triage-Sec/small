@@ -21,6 +21,47 @@ if TYPE_CHECKING:
 logger = logging.getLogger(__name__)
 
 
+# Model pricing (input tokens only) used for cost-savings estimates.
+# Values are USD per 1,000,000 input tokens.
+# Source: official vendor pricing pages, as of 2026-01-30.
+MODEL_INPUT_USD_PER_MTOK: dict[str, float] = {
+    # OpenAI
+    "gpt-5.2-thinking": 1.75,
+    # Google
+    "gemini-3.0-pro": 2.00,
+    "gemini-3.0-flash": 0.50,
+    # Anthropic
+    "claude-opus-4.5": 5.00,
+}
+
+
+def estimate_input_saved_usd(tokens_saved: int) -> dict[str, float]:
+    """Estimate input-token cost savings for common models.
+
+    Notes:
+        Tokenization and billing may differ across model providers. This is best-effort
+        based on the token counts you provide (or tiktoken when using compress_text/
+        compress_context).
+    """
+    if tokens_saved <= 0:
+        return {name: 0.0 for name in MODEL_INPUT_USD_PER_MTOK}
+
+    return {
+        name: round((usd_per_mtok / 1_000_000) * tokens_saved, 6)
+        for name, usd_per_mtok in MODEL_INPUT_USD_PER_MTOK.items()
+    }
+
+
+def build_cost_estimate(*, tokens_saved: int, token_basis: str) -> dict[str, Any]:
+    """Build a structured cost estimate payload."""
+    return {
+        "as_of": "2026-01-30",
+        "token_basis": token_basis,
+        "input_usd_per_million_tokens": MODEL_INPUT_USD_PER_MTOK,
+        "estimated_input_saved_usd": estimate_input_saved_usd(tokens_saved),
+    }
+
+
 # Tool definitions (JSON Schema format for MCP)
 TOOL_DEFINITIONS = [
     {
@@ -522,6 +563,8 @@ class ToolHandlers:
             )
         )
 
+        tokens_saved = original_len - compressed_len
+
         return {
             "original_context_length": len(context),
             "original_token_count": original_len,
@@ -529,7 +572,7 @@ class ToolHandlers:
             "preserved_token_count": len(preserved),
             "compression_ratio": round(ratio, 4),
             "savings_percent": round(savings, 2),
-            "tokens_saved": original_len - compressed_len,
+            "tokens_saved": tokens_saved,
             "compressed_tokens": final_tokens,
             "patterns_found": len(result.dictionary_map),
             "timing": {
@@ -537,10 +580,10 @@ class ToolHandlers:
                 "compress_ms": round(compress_ms, 2),
                 "total_ms": round(total_ms, 2),
             },
-            "cost_estimate": {
-                "gpt4_input_saved_usd": round((original_len - compressed_len) * 0.00003, 4),
-                "claude_input_saved_usd": round((original_len - compressed_len) * 0.000015, 4),
-            },
+            "cost_estimate": build_cost_estimate(
+                tokens_saved=tokens_saved,
+                token_basis=f"tiktoken:{encoding_name}",
+            ),
         }
 
     def get_session_metrics(self, params: dict[str, Any]) -> dict[str, Any]:
@@ -551,10 +594,10 @@ class ToolHandlers:
 
         # Add cost estimates
         if result["total_tokens_saved"] > 0:
-            result["cost_estimates"] = {
-                "gpt4_input_saved_usd": round(result["total_tokens_saved"] * 0.00003, 4),
-                "claude_input_saved_usd": round(result["total_tokens_saved"] * 0.000015, 4),
-            }
+            result["cost_estimate"] = build_cost_estimate(
+                tokens_saved=result["total_tokens_saved"],
+                token_basis="token counts reported by MCP operations",
+            )
 
         if include_ops:
             result["operations"] = self.metrics.get_operations()

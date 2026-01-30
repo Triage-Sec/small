@@ -71,7 +71,7 @@ jobs:
     if: github.event_name == 'release' && github.event.action == 'published'
     environment:
       name: pypi
-      url: https://pypi.org/p/small
+      url: https://pypi.org/p/small-ltsc
     permissions:
       id-token: write
     steps:

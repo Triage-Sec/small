@@ -11,7 +11,13 @@ Example:
     >>> assert decompress(result.serialized_tokens) == tokens
 """
 
-__version__ = "0.2.0"
+from importlib.metadata import PackageNotFoundError, version
+
+try:
+    __version__ = version("small-ltsc")
+except PackageNotFoundError:  # pragma: no cover
+    # Fallback for editable installs without metadata or direct source usage.
+    __version__ = "0.0.0"
 
 # Core compression API
 from .compressor import (
