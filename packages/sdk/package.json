@@ -1,6 +1,6 @@
 {
   "name": "@small-ltsc/sdk",
-"version": "0.2.5",
+"version": "0.2.6",
   "description": "TypeScript SDK for Small LTSC - Lossless Token Sequence Compression",
   "type": "module",
   "main": "./dist/esm/index.js",
@@ -25,7 +25,7 @@
     "build": "npm run build:esm && npm run build:types && npm run copy:wasm && npm run copy:json",
     "build:esm": "tsc -p tsconfig.esm.json",
     "build:types": "tsc -p tsconfig.types.json",
-    "copy:wasm": "cp src/wasm/*.wasm dist/esm/wasm/ 2>/dev/null || mkdir -p dist/esm/wasm && cp src/wasm/*.wasm dist/esm/wasm/",
+    "copy:wasm": "mkdir -p dist/esm/wasm && (cp src/wasm/*.wasm dist/esm/wasm/ 2>/dev/null || cp src/wasm/pkg/*.wasm dist/esm/wasm/ 2>/dev/null || echo 'No WASM files found')",
     "copy:json": "cp src/dictionaries/*.json dist/esm/dictionaries/ 2>/dev/null || mkdir -p dist/esm/dictionaries && cp src/dictionaries/*.json dist/esm/dictionaries/",
     "test": "vitest",
     "test:browser": "playwright test",
