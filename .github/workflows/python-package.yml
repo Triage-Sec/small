@@ -56,7 +56,7 @@ jobs:
           python-version: '3.11'
 
       - name: Install ruff
-        run: pip install ruff
+        run: pip install ruff==0.14.14
 
       - name: Run ruff check
         run: ruff check small/
