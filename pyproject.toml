@@ -1,6 +1,6 @@
 [project]
 name = "small-ltsc"
-version = "0.2.15"
+version = "0.2.16"
 description = "Lossless token sequence compression for large language models"
 readme = "README.md"
 requires-python = ">=3.10"

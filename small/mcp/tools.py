@@ -426,7 +426,7 @@ class ToolHandlers:
         savings = (1 - ratio) * 100
 
         # Extract pattern info
-        patterns = [
+        patterns: list[dict[str, Any]] = [
             {"pattern": list(seq), "length": len(seq), "meta_token": meta}
             for meta, seq in result.dictionary_map.items()
         ]
@@ -461,9 +461,9 @@ class ToolHandlers:
             "potential_compressed_length": result.compressed_length,
             "potential_savings_percent": round(savings, 2),
             "patterns_detected": len(patterns),
-            "top_patterns": sorted(patterns, key=lambda p: p["length"], reverse=True)[
-                :10
-            ],
+            "top_patterns": sorted(
+                patterns, key=lambda p: int(p["length"]), reverse=True
+            )[:10],
             "recommendation": recommendation,
             "time_ms": round(elapsed_ms, 2),
         }
@@ -649,7 +649,7 @@ class ToolHandlers:
 
         def gen_repeated(n: int) -> list[int]:
             pattern = [random.choice(COMMON_TOKENS) for _ in range(6)]
-            result = []
+            result: list[int] = []
             while len(result) < n:
                 result.extend(pattern)
                 result.extend(
@@ -659,7 +659,7 @@ class ToolHandlers:
 
         def gen_code(n: int) -> list[int]:
             indent = [100, 100, 100, 100]
-            result = []
+            result: list[int] = []
             while len(result) < n:
                 result.extend([200, 201, 202])
                 result.extend([random.choice(COMMON_TOKENS) for _ in range(3)])
