@@ -10,6 +10,23 @@
 
 Small is a production-ready lossless compression system that reduces the computational and economic cost of LLM inference by eliminating redundancy in input sequences before they reach the model. It replaces repeated multi-token patterns with compact meta-token references backed by a learnable dictionary format, achieving 30-60% compression on structured inputs while guaranteeing perfect reconstruction.
 
+## About
+
+### [Triage](https://triage-sec.com)
+
+Triage is building the resiliency layer for AI systems. We expose deep observability into staging environments so coding agents can statically reason about codebases, predict runtime behavior, and remediate production issues autonomously. On the research side, we're filling latent space in frozen models to address known system weaknesses, building dynamic guardrails for real-time threat detection, and designing bureaucratic authorization flows that route sensitive operations to the right humans at the right time. The thesis behind everything we build: security should learn from every failure and compound over time, not reset with each new signature. We're compressing MTTR toward zero by treating every incident as training data for the next.
+
+### Why We Built Small
+
+Small emerged from a pattern we kept seeing while building Triage and talking to teams deploying LLM-powered products: context-augmented generation produces massively redundant token sequences, and inference costs scale linearly with every one of them. The same boilerplate, the same structural patterns, the same retrieved chunks appear repeatedly across requests. LTSC (Lossless Token Sequence Compression) identifies and compresses these recurring patterns without semantic loss, targeting the specific redundancy profiles that coding agents, retrieval systems, and multi-turn conversations create. We built it as an open-source contribution because inference cost remains one of the most underappreciated bottlenecks to AI adoption, particularly for the agentic workflows where context windows balloon quickly. Solving it at the compression layer lets teams ship more capable agents without burning through API budgets or making architectural compromises to stay under token limits.
+
+### Contributors
+
+This project was constructed by:
+- **Nikhil Srivastava** (University of California, Berkeley)
+- **Omansh Bainsla** (Georgia Tech)
+- **Sahil Chatiwala** (Georgia Tech)
+
 ## Why Small?
 
 As context augmentation techniques become standard practice (retrieval-augmented generation, tool schemas, code repositories, policy documents, multi-turn conversations), input sequences increasingly contain repeated subsequences that consume context window budget and quadratic attention compute without contributing new information.
@@ -364,15 +381,6 @@ Contributions are welcome. Please ensure:
 2. Code is formatted (`ruff format` for Python, `prettier` for TypeScript)
 3. Type hints are complete (`mypy small/` for Python)
 4. New features include tests and documentation
-
-## Contributors
-
-[Triage Sec](https://triage-sec.com) is an applied team of researchers and engineers working towards building resiliency for AI systems.
-
-This project was constructed by:
-- **Nikhil Srivastava** (University of California, Berkeley)
-- **Omansh Bainsla** (Georgia Tech)
-- **Sahil Chatiwala** (Georgia Tech)
 
 ## Acknowledgments
 
