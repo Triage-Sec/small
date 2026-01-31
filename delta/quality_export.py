@@ -18,7 +18,7 @@ if TYPE_CHECKING:
 
 def export_prometheus(
     summary: "QualitySummary",
-    prefix: str = "small_compression",
+    prefix: str = "delta_compression",
     labels: dict[str, str] | None = None,
 ) -> str:
     """Export summary as Prometheus exposition format.

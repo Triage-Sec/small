@@ -5,7 +5,7 @@ fit entirely in memory. Data is processed in chunks with configurable
 overlap to detect cross-chunk patterns.
 
 Example:
-    >>> from small.streaming import StreamingCompressor
+    >>> from delta.streaming import StreamingCompressor
     >>> compressor = StreamingCompressor(chunk_size=4096)
     >>> for batch in token_batches:
     ...     result = compressor.add_tokens(batch)

@@ -35,7 +35,7 @@ class MCPConfig:
 
     max_input_tokens: int = 100_000
     max_text_length: int = 500_000
-    metrics_dir: Path | None = field(default_factory=lambda: Path.home() / ".small")
+    metrics_dir: Path | None = field(default_factory=lambda: Path.home() / ".delta")
     metrics_file: str = "mcp_metrics.jsonl"
     log_level: Literal["DEBUG", "INFO", "WARNING", "ERROR"] = "INFO"
     enable_benchmarks: bool = True
@@ -80,7 +80,7 @@ class MCPConfig:
         return cls(
             max_input_tokens=get_env_int("MAX_INPUT_TOKENS", 100_000),
             max_text_length=get_env_int("MAX_TEXT_LENGTH", 500_000),
-            metrics_dir=get_env_path("METRICS_DIR", Path.home() / ".small"),
+            metrics_dir=get_env_path("METRICS_DIR", Path.home() / ".delta"),
             metrics_file=get_env("METRICS_FILE", "mcp_metrics.jsonl"),
             log_level=get_env("LOG_LEVEL", "INFO"),  # type: ignore[arg-type]
             enable_benchmarks=get_env_bool("ENABLE_BENCHMARKS", True),

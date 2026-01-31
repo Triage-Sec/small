@@ -3,7 +3,7 @@
 //! Implements O(n log n) suffix array construction using the doubling algorithm
 //! and O(n) LCP computation using Kasai's algorithm.
 //!
-//! Port of `small/suffix_array.py` and `small/suffix_array_fast.py`.
+//! Port of `delta/suffix_array.py` and `delta/suffix_array_fast.py`.
 
 use crate::types::Token;
 use std::collections::HashMap;

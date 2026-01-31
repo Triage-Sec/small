@@ -1,6 +1,6 @@
 //! Core types for LTSC compression.
 //!
-//! These types mirror the Python implementation in `small/types.py`
+//! These types mirror the Python implementation in `delta/types.py`
 //! but are optimized for WASM performance.
 
 use serde::{Deserialize, Serialize};

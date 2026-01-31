@@ -91,7 +91,7 @@ def compute_metrics(
 
 
 def log_metrics(metrics: CompressionMetrics) -> None:
-    logger = logging.getLogger("small.metrics")
+    logger = logging.getLogger("delta.metrics")
     logger.info(
         "compression_amount=%.4f compression_ratio=%.4f effective_savings=%d candidates=%d patterns_used=%d avg_len=%.2f avg_freq=%.2f dict_overhead=%.4f depths=%s",
         metrics.compression_amount,
@@ -107,7 +107,7 @@ def log_metrics(metrics: CompressionMetrics) -> None:
 
 
 def log_cache_stats(stats: dict[str, int]) -> None:
-    logger = logging.getLogger("small.metrics")
+    logger = logging.getLogger("delta.metrics")
     hits = stats.get("hits", 0)
     misses = stats.get("misses", 0)
     total = hits + misses

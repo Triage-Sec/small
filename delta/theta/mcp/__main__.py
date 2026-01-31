@@ -1,4 +1,4 @@
-"""Entry point for running the MCP server via python -m small.mcp."""
+"""Entry point for running the MCP server via python -m delta.mcp."""
 
 from .server import run_server
 

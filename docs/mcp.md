@@ -18,7 +18,7 @@ pip install "delta-ltsc[all,mcp]"
 
 ```bash
 # Preferred (works reliably with venvs):
-python -m small.mcp
+python -m delta.mcp
 
 # If `delta-mcp` is on PATH (pip console script):
 delta-mcp
@@ -126,7 +126,7 @@ Warp provides native MCP support through its AI Agent Mode. To add Small:
       "command": "/path/to/venv/bin/python",
       "args": ["-m", "delta.mcp"],
       "env": {
-        "SMALL_MCP_LOG_LEVEL": "DEBUG"
+        "DELTA_MCP_LOG_LEVEL": "DEBUG"
       }
     }
   }
@@ -245,23 +245,23 @@ Reset current session metrics.
 
 ## Configuration
 
-All settings can be configured via environment variables (prefixed with `SMALL_MCP_`):
+All settings can be configured via environment variables (prefixed with `DELTA_MCP_`):
 
 | Variable | Default | Description |
 |----------|---------|-------------|
-| `SMALL_MCP_MAX_INPUT_TOKENS` | 100000 | Max tokens per request |
-| `SMALL_MCP_MAX_TEXT_LENGTH` | 500000 | Max text length (chars) |
-| `SMALL_MCP_METRICS_DIR` | `~/.small` | Metrics storage directory |
-| `SMALL_MCP_METRICS_FILE` | `mcp_metrics.jsonl` | Metrics filename |
-| `SMALL_MCP_LOG_LEVEL` | INFO | Logging level |
-| `SMALL_MCP_ENABLE_BENCHMARKS` | true | Allow benchmark tool |
-| `SMALL_MCP_DEFAULT_MIN_LENGTH` | 2 | Default min pattern length |
-| `SMALL_MCP_DEFAULT_MAX_LENGTH` | 16 | Default max pattern length |
-| `SMALL_MCP_VERIFY_ROUNDTRIP` | true | Verify decompression |
-| `SMALL_MCP_DISCOVERY_MODE` | suffix-array | Discovery algorithm |
-| `SMALL_MCP_SELECTION_MODE` | greedy | Selection algorithm |
+| `DELTA_MCP_MAX_INPUT_TOKENS` | 100000 | Max tokens per request |
+| `DELTA_MCP_MAX_TEXT_LENGTH` | 500000 | Max text length (chars) |
+| `DELTA_MCP_METRICS_DIR` | `~/.delta` | Metrics storage directory |
+| `DELTA_MCP_METRICS_FILE` | `mcp_metrics.jsonl` | Metrics filename |
+| `DELTA_MCP_LOG_LEVEL` | INFO | Logging level |
+| `DELTA_MCP_ENABLE_BENCHMARKS` | true | Allow benchmark tool |
+| `DELTA_MCP_DEFAULT_MIN_LENGTH` | 2 | Default min pattern length |
+| `DELTA_MCP_DEFAULT_MAX_LENGTH` | 16 | Default max pattern length |
+| `DELTA_MCP_VERIFY_ROUNDTRIP` | true | Verify decompression |
+| `DELTA_MCP_DISCOVERY_MODE` | suffix-array | Discovery algorithm |
+| `DELTA_MCP_SELECTION_MODE` | greedy | Selection algorithm |
 
-To disable metrics persistence, set `SMALL_MCP_METRICS_DIR=none`.
+To disable metrics persistence, set `DELTA_MCP_METRICS_DIR=none`.
 
 ## Example Usage
 
@@ -316,7 +316,7 @@ print(result)
 
 ## Metrics & Monitoring
 
-The MCP server tracks all operations in a JSONL file (default: `~/.small/mcp_metrics.jsonl`). Each line contains:
+The MCP server tracks all operations in a JSONL file (default: `~/.delta/mcp_metrics.jsonl`). Each line contains:
 
 ```json
 {
@@ -340,7 +340,7 @@ Use `get_historical_metrics` to query this data or process the file directly for
 
 1. Ensure `delta-ltsc[mcp]` is installed
 2. Check Python version (requires 3.10+)
-3. Try running with debug logging: `SMALL_MCP_LOG_LEVEL=DEBUG delta-mcp`
+3. Try running with debug logging: `DELTA_MCP_LOG_LEVEL=DEBUG delta-mcp`
 
 ### Tools not appearing in client
 
@@ -356,4 +356,4 @@ Use `get_historical_metrics` to query this data or process the file directly for
 
 ### Logs
 
-Server logs go to stderr. In most MCP clients, these are captured in debug logs. Set `SMALL_MCP_LOG_LEVEL=DEBUG` for verbose output.
+Server logs go to stderr. In most MCP clients, these are captured in debug logs. Set `DELTA_MCP_LOG_LEVEL=DEBUG` for verbose output.

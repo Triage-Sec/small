@@ -1,7 +1,7 @@
 {
   "name": "@delta-ltsc/sdk",
-"version": "0.2.20",
-  "description": "TypeScript SDK for Small LTSC - Lossless Token Sequence Compression",
+  "version": "0.3.0",
+  "description": "TypeScript SDK for Delta LTSC - Lossless Token Sequence Compression",
   "type": "module",
   "main": "./dist/esm/index.js",
   "module": "./dist/esm/index.js",

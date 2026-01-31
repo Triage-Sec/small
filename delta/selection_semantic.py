@@ -10,8 +10,8 @@ Requires an embedding provider (OpenAI, Voyage, sentence-transformers, etc.).
 Falls back to optimal selection if no provider is available.
 
 Usage:
-    from small.selection_semantic import select_occurrences_semantic
-    from small.embeddings import create_provider
+    from delta.selection_semantic import select_occurrences_semantic
+    from delta.embeddings import create_provider
 
     provider = create_provider("openai")
     selected = select_occurrences_semantic(candidates, tokens, config, provider)

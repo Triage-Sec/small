@@ -47,7 +47,7 @@ class EmbeddingImportanceScorer:
     that appear in diverse contexts carry unique information each time
     (important, compress carefully).
 
-    Requires an EmbeddingProvider from small.embeddings.
+    Requires an EmbeddingProvider from delta.embeddings.
     """
 
     provider: object  # EmbeddingProvider
@@ -306,7 +306,7 @@ def create_embedding_scorer(provider: object) -> CompositeImportanceScorer:
     """Create a scorer that includes embedding-based importance.
 
     Args:
-        provider: An EmbeddingProvider from small.embeddings
+        provider: An EmbeddingProvider from delta.embeddings
     """
     return CompositeImportanceScorer(
         scorers=[

@@ -26,4 +26,4 @@ def main(source_dir: str, out_path: str) -> None:
 
 
 if __name__ == "__main__":
-    main(".", "tests/fixtures/corpora/code/python_small.jsonl")
+    main(".", "tests/fixtures/corpora/code/python_delta.jsonl")

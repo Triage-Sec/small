@@ -1,7 +1,7 @@
 /**
  * Pattern importance scoring for ML-aware compression.
  *
- * Port of `small/pattern_importance.py` to TypeScript.
+ * Port of `delta/pattern_importance.py` to TypeScript.
  */
 
 import type { DiscoveredPattern, TokenSeq } from '@delta-ltsc/sdk';

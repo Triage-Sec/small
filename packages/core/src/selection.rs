@@ -3,7 +3,7 @@
 //! Implements greedy selection with iterative refinement for choosing
 //! non-overlapping pattern occurrences that maximize compression savings.
 //!
-//! Port of `small/selection.py`.
+//! Port of `delta/selection.py`.
 
 use crate::types::{is_compressible, min_count_for_compressibility, Candidate, Occurrence, Token};
 use std::collections::{HashMap, HashSet};

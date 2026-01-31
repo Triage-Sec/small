@@ -4,7 +4,7 @@
  * Predicts whether a compressed sequence will maintain
  * sufficient quality for transformer models to learn from.
  *
- * Port of `small/quality_predictor.py` to TypeScript.
+ * Port of `delta/quality_predictor.py` to TypeScript.
  */
 
 import type { CompressionResult } from '@delta-ltsc/sdk';

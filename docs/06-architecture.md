@@ -23,7 +23,7 @@ Small is structured as a modular pipeline where each stage has explicit input/ou
 
 External tokenizers convert text to token sequences. Small operates on any hashable token type.
 
-**Adapters** (`small/tokenizer.py`):
+**Adapters** (`delta/tokenizer.py`):
 - Hugging Face Transformers
 - tiktoken (OpenAI)
 - SentencePiece

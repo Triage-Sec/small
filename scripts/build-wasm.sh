@@ -88,7 +88,7 @@ fi
 # Copy main WASM file to SDK src
 echo ""
 echo "Copying WASM files..."
-cp "$SDK_DIR/src/wasm/pkg/small_ltsc_core_bg.wasm" "$SDK_DIR/src/wasm/" 2>/dev/null || true
+cp "$SDK_DIR/src/wasm/pkg/delta_ltsc_core_bg.wasm" "$SDK_DIR/src/wasm/" 2>/dev/null || true
 
 echo ""
 echo "WASM build complete!"

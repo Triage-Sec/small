@@ -5,10 +5,10 @@ Claude Desktop, and other AI coding assistants.
 
 Usage:
     # Run the MCP server
-    small-mcp
+    delta-mcp
 
     # Or via Python
-    python -m small.mcp
+    python -m delta.mcp
 """
 
 from .config import MCPConfig

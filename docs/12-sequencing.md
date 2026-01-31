@@ -12,11 +12,11 @@ Implemented:
 
 Relevant modules:
 
-- `small/sequence.py`
-- `small/suffix_array.py`
-- `small/discovery_sa.py`
-- `small/selection.py`
-- `small/compressor.py`
+- `delta/sequence.py`
+- `delta/suffix_array.py`
+- `delta/discovery_sa.py`
+- `delta/selection.py`
+- `delta/compressor.py`
 
 ## Phase Two: Selection Optimization
 
@@ -27,8 +27,8 @@ Implemented:
 
 Relevant modules:
 
-- `small/selection.py`
-- `small/config.py`
+- `delta/selection.py`
+- `delta/config.py`
 
 ## Phase Three: Hierarchical Compression
 
@@ -41,9 +41,9 @@ Implemented:
 
 Relevant modules:
 
-- `small/compressor.py`
-- `small/dictionary.py`
-- `small/config.py`
+- `delta/compressor.py`
+- `delta/dictionary.py`
+- `delta/config.py`
 
 ## Phase Four: Grammar-Aware Compression
 
@@ -55,8 +55,8 @@ Implemented (Python):
 
 Relevant modules:
 
-- `small/ast_python.py`
-- `small/compressor.py`
+- `delta/ast_python.py`
+- `delta/compressor.py`
 
 ## Phase Five: Domain Dictionaries
 
@@ -69,10 +69,10 @@ Implemented:
 
 Relevant modules:
 
-- `small/static_dicts.py`
-- `small/domain.py`
-- `small/compressor.py`
-- `small/training.py`
+- `delta/static_dicts.py`
+- `delta/domain.py`
+- `delta/compressor.py`
+- `delta/training.py`
 
 ## Phase Six: Fuzzy Matching
 
@@ -84,6 +84,6 @@ Implemented (minimal):
 
 Relevant modules:
 
-- `small/fuzzy.py`
-- `small/dictionary.py`
-- `small/compressor.py`
+- `delta/fuzzy.py`
+- `delta/dictionary.py`
+- `delta/compressor.py`

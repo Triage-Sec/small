@@ -4,7 +4,7 @@
  * Detects semantic regions in token sequences (system prompts, user input,
  * injected context) and applies different compression strategies.
  *
- * Port of `small/adaptive.py` region detection to TypeScript.
+ * Port of `delta/adaptive.py` region detection to TypeScript.
  */
 
 import type { TokenSeq, DiscoveredPattern } from '@delta-ltsc/sdk';

@@ -1,7 +1,7 @@
 //! Dictionary serialization and deserialization.
 //!
 //! Implements the LTSC compression format for dictionary and body tokens.
-//! Port of `small/dictionary.py` and `small/serialization.py`.
+//! Port of `delta/dictionary.py` and `delta/serialization.py`.
 
 use crate::types::{CompressionConfig, CompressionResult, Occurrence, Token};
 use std::collections::HashMap;

@@ -351,7 +351,7 @@ cargo test                          # Unit tests
 If you use Delta in your research, please cite:
 
 ```bibtex
-@software{small2026,
+@software{delta2026,
   title={Delta: Lossless Token Sequence Compression for Large Language Models},
   author={{Triage Sec}},
   year={2026},

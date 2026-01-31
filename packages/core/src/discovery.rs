@@ -3,7 +3,7 @@
 //! Implements suffix array-based pattern discovery for finding repeated
 //! subsequences in token sequences.
 //!
-//! Port of `small/discovery_sa.py`.
+//! Port of `delta/discovery_sa.py`.
 
 use crate::suffix_array::{non_overlapping_positions, SuffixArray};
 use crate::types::{is_compressible, min_count_for_compressibility, Candidate, Token};

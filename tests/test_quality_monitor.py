@@ -532,16 +532,16 @@ class TestExports:
         # Should be valid Prometheus format
         assert "# HELP" in output
         assert "# TYPE" in output
-        assert "small_compression_compression_ratio_mean" in output
-        assert "small_compression_degradation_mean" in output
+        assert "delta_compression_compression_ratio_mean" in output
+        assert "delta_compression_degradation_mean" in output
         assert "gauge" in output
 
     def test_export_prometheus_with_labels(self):
         summary = self._make_summary()
-        output = export_prometheus(summary, labels={"env": "test", "service": "small"})
+        output = export_prometheus(summary, labels={"env": "test", "service": "delta"})
         
         assert 'env="test"' in output
-        assert 'service="small"' in output
+        assert 'service="delta"' in output
 
     def test_export_summary_ascii(self):
         summary = self._make_summary()
@@ -692,7 +692,7 @@ class TestIntegration:
         
         # Export
         prometheus_output = export_prometheus(summary)
-        assert "small_compression" in prometheus_output
+        assert "delta_compression" in prometheus_output
         
         ascii_output = export_summary_ascii(summary)
         assert "COMPRESSION QUALITY SUMMARY" in ascii_output

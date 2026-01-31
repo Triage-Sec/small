@@ -60,7 +60,7 @@ class SQLiteCacheConfig:
 @dataclass(frozen=True)
 class RedisCacheConfig:
     url: str = "redis://localhost:6379/0"
-    key_prefix: str = "small:emb:"
+    key_prefix: str = "delta:emb:"
     ttl_days: int | None = None
 
 

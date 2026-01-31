@@ -5,7 +5,7 @@ to reduce the computational and economic cost of LLM inference by eliminating
 redundancy in input sequences before they reach the model.
 
 Example:
-    >>> from small import compress, decompress, CompressionConfig
+    >>> from delta import compress, decompress, CompressionConfig
     >>> tokens = ["the", "cat", "sat", "on", "the", "mat"] * 10
     >>> result = compress(tokens, CompressionConfig())
     >>> assert decompress(result.serialized_tokens) == tokens
