@@ -15,8 +15,8 @@ from typing import Literal
 class MCPConfig:
     """Configuration for the MCP server.
 
-    All settings can be overridden via environment variables prefixed with SMALL_MCP_.
-    For example: SMALL_MCP_MAX_INPUT_TOKENS=50000
+    All settings can be overridden via environment variables prefixed with DELTA_MCP_.
+    For example: DELTA_MCP_MAX_INPUT_TOKENS=50000
 
     Attributes:
         max_input_tokens: Maximum tokens allowed in a single compress request.
@@ -57,20 +57,20 @@ class MCPConfig:
         """Create config from environment variables."""
 
         def get_env(key: str, default: str) -> str:
-            return os.environ.get(f"SMALL_MCP_{key}", default)
+            return os.environ.get(f"DELTA_MCP_{key}", default)
 
         def get_env_int(key: str, default: int) -> int:
-            val = os.environ.get(f"SMALL_MCP_{key}")
+            val = os.environ.get(f"DELTA_MCP_{key}")
             return int(val) if val else default
 
         def get_env_bool(key: str, default: bool) -> bool:
-            val = os.environ.get(f"SMALL_MCP_{key}")
+            val = os.environ.get(f"DELTA_MCP_{key}")
             if val is None:
                 return default
             return val.lower() in ("1", "true", "yes", "on")
 
         def get_env_path(key: str, default: Path | None) -> Path | None:
-            val = os.environ.get(f"SMALL_MCP_{key}")
+            val = os.environ.get(f"DELTA_MCP_{key}")
             if val is None:
                 return default
             if val.lower() in ("", "none", "null", "false"):

@@ -1,4 +1,4 @@
-"""MCP Server implementation for Small LTSC.
+"""MCP Server implementation for Delta LTSC.
 
 Implements the Model Context Protocol (MCP) over stdio for integration
 with AI coding assistants like Cursor, Claude Desktop, and Windsurf.
@@ -214,7 +214,7 @@ class MCPServer:
 
     def run(self) -> None:
         """Run the MCP server, reading from stdin."""
-        logger.info("Small LTSC MCP server starting (version %s)", __version__)
+        logger.info("Delta LTSC MCP server starting (version %s)", __version__)
         logger.info("Metrics: %s", self.config.metrics_path or "disabled")
         logger.info(
             "Pattern cache: %s (%d patterns)",

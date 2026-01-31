@@ -14,7 +14,7 @@ This yields exactly three allowed cases:
 - N = 3, K >= 3
 - N = 2, K >= 4
 
-Small enforces this as a mandatory filter for all candidate patterns.
+Delta enforces this as a mandatory filter for all candidate patterns.
 
 ## Three-Phase Structure
 

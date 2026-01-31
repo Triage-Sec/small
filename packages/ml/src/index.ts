@@ -1,5 +1,5 @@
 /**
- * Small LTSC ML - Machine Learning Features
+ * Delta LTSC ML - Machine Learning Features
  *
  * Optional ML features for enhanced compression quality:
  * - Pattern importance scoring

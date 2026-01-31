@@ -1,6 +1,6 @@
 # API Reference
 
-Complete API documentation for Small.
+Complete API documentation for Delta.
 
 ## Core Functions
 

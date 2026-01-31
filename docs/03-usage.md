@@ -1,6 +1,6 @@
 # Usage
 
-Small operates on token sequences, not raw text. Tokens are represented as hashable values (typically strings or integers). You can integrate Small with any tokenizer by converting text to tokens before compression.
+Delta operates on token sequences, not raw text. Tokens are represented as hashable values (typically strings or integers). You can integrate Delta with any tokenizer by converting text to tokens before compression.
 
 ## High-Level Flow
 

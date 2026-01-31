@@ -93,7 +93,7 @@ Add to Windsurf MCP configuration:
 
 ### Warp Terminal
 
-Warp provides native MCP support through its AI Agent Mode. To add Small:
+Warp provides native MCP support through its AI Agent Mode. To add Delta:
 
 1. Open Warp and navigate to **Settings > AI > Manage MCP servers** (or use `Cmd+Shift+P` and search for "MCP")
 2. Click **+ Add** and paste the following JSON:

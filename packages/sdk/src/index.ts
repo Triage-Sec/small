@@ -1,5 +1,5 @@
 /**
- * Small LTSC SDK - Lossless Token Sequence Compression
+ * Delta LTSC SDK - Lossless Token Sequence Compression
  *
  * A TypeScript SDK for compressing LLM token sequences to reduce
  * inference costs and context length requirements.

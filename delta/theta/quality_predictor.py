@@ -217,7 +217,7 @@ class CompressionQualityPredictor:
         # Small inputs may not benefit and overhead is proportionally higher
         if features["original_length"] < 100 and num_patterns > 5:
             degradation += 0.02
-            risk_factors.append("Small input with many patterns")
+            risk_factors.append("Delta input with many patterns")
 
         return min(1.0, degradation), risk_factors
 

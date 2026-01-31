@@ -80,7 +80,7 @@ Tokens → Discovery → Selection → Replacement → Serialization
    - `selection_mode="beam"`: Bounded exploration
    - `selection_mode="ilp"`: Global optimal via ILP solver
 
-3. **Replacement** (`delta/swap.py`, `small/dictionary.py`): Substitutes patterns with meta-tokens
+3. **Replacement** (`delta/swap.py`, `delta/dictionary.py`): Substitutes patterns with meta-tokens
 
 4. **Serialization** (`delta/serialization.py`): Produces `<Dict>...</Dict>` format
 

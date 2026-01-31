@@ -31,8 +31,8 @@
   <script type="importmap">
     {
       "imports": {
-        "@small-ltsc/sdk": "/dist/esm/index.js",
-        "@small-ltsc/sdk/wasm": "/dist/esm/wasm/index.js"
+        "@delta-ltsc/sdk": "/dist/esm/index.js",
+        "@delta-ltsc/sdk/wasm": "/dist/esm/wasm/index.js"
       }
     }
   </script>
@@ -50,7 +50,7 @@
         status.textContent = 'Initializing WASM...';
         
         // Import SDK
-        const sdk = await import('@small-ltsc/sdk');
+        const sdk = await import('@delta-ltsc/sdk');
         log('✓ SDK imported');
 
         // Initialize WASM

@@ -1,5 +1,5 @@
 /**
- * Static dictionary support for Small LTSC.
+ * Static dictionary support for Delta LTSC.
  *
  * Pre-built dictionaries for common domains that can be used
  * to improve compression of domain-specific content.

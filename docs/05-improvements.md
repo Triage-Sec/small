@@ -1,6 +1,6 @@
 # Improvements and Extensions
 
-This document summarizes the major improvements and research-grade extensions available in Small, organized by impact and scope.
+This document summarizes the major improvements and research-grade extensions available in Delta, organized by impact and scope.
 
 ## Critical Algorithmic Fixes
 

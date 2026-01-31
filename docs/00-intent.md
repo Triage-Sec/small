@@ -6,7 +6,7 @@ LLMs process token sequences with quadratic cost in sequence length. External co
 
 ## Foundational Work
 
-Small builds on "Lossless Token Sequence Compression via Meta-Tokens" by Harvill et al. Repeated subsequences are replaced with meta-tokens, and a dictionary maps each meta-token to its original subsequence. Transformer models can learn this representation with fine-tuning.
+Delta builds on "Lossless Token Sequence Compression via Meta-Tokens" by Harvill et al. Repeated subsequences are replaced with meta-tokens, and a dictionary maps each meta-token to its original subsequence. Transformer models can learn this representation with fine-tuning.
 
 ## Objective
 

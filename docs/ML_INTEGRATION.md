@@ -1,6 +1,6 @@
 # ML Integration Guide
 
-Small provides several ML-powered features to improve compression quality and adapt to different use cases. This guide covers pattern importance scoring, region-aware compression, and quality prediction.
+Delta provides several ML-powered features to improve compression quality and adapt to different use cases. This guide covers pattern importance scoring, region-aware compression, and quality prediction.
 
 ## Pattern Importance Scoring
 

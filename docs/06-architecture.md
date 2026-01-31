@@ -2,7 +2,7 @@
 
 ## Overview
 
-Small is structured as a modular pipeline where each stage has explicit input/output contracts and can be independently configured or replaced.
+Delta is structured as a modular pipeline where each stage has explicit input/output contracts and can be independently configured or replaced.
 
 ```
 ┌─────────────┐    ┌───────────────┐    ┌────────────────┐    ┌─────────────┐    ┌────────────────┐
@@ -21,7 +21,7 @@ Small is structured as a modular pipeline where each stage has explicit input/ou
 
 ### 1. Tokenization
 
-External tokenizers convert text to token sequences. Small operates on any hashable token type.
+External tokenizers convert text to token sequences. Delta operates on any hashable token type.
 
 **Adapters** (`delta/tokenizer.py`):
 - Hugging Face Transformers

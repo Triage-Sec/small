@@ -1,6 +1,6 @@
 # Quick Start Guide
 
-Get started with Small LTSC in under 5 minutes. This guide covers the most common use case: compressing prompts before sending them to an LLM API.
+Get started with Delta LTSC in under 5 minutes. This guide covers the most common use case: compressing prompts before sending them to an LLM API.
 
 ## Installation
 

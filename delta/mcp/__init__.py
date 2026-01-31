@@ -1,4 +1,4 @@
-"""MCP Server for Small LTSC compression.
+"""MCP Server for Delta LTSC compression.
 
 Exposes token compression as tools for MCP-compatible clients like Cursor,
 Claude Desktop, and other AI coding assistants.

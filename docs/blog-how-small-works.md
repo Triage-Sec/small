@@ -1,4 +1,4 @@
-# Small: Lossless Token Sequence Compression for Large Language Models
+# Delta: Lossless Token Sequence Compression for Large Language Models
 
 *A Technical Exposition on Dictionary-Based Compression, Algorithmic Guarantees, and the Economics of Inference Cost Reduction*
 
@@ -6,7 +6,7 @@
 
 ## Abstract
 
-We present **Small**, an open-source implementation of Lossless Token Sequence Compression (LTSC) designed to reduce the computational and economic cost of large language model inference. Small identifies repeated multi-token subsequences within input sequences and replaces them with compact meta-token references backed by a prefix dictionary. The system achieves 30-60% compression on structured inputs while providing mathematical guarantees of perfect reconstruction. This technical exposition details the algorithmic foundations, complexity analysis, and empirical performance characteristics that underpin Small's design.
+We present **Delta**, an open-source implementation of Lossless Token Sequence Compression (LTSC) designed to reduce the computational and economic cost of large language model inference. Delta identifies repeated multi-token subsequences within input sequences and replaces them with compact meta-token references backed by a prefix dictionary. The system achieves 30-60% compression on structured inputs while providing mathematical guarantees of perfect reconstruction. This technical exposition details the algorithmic foundations, complexity analysis, and empirical performance characteristics that underpin Delta's design.
 
 ---
 
@@ -40,7 +40,7 @@ This yields monthly costs exceeding $75,000—a significant fraction of which is
 
 ## 2. Theoretical Foundation: The Compressibility Constraint
 
-Small's core operation is the replacement of repeated token patterns with dictionary references. The fundamental constraint governing this replacement ensures that compression never increases sequence length.
+Delta's core operation is the replacement of repeated token patterns with dictionary references. The fundamental constraint governing this replacement ensures that compression never increases sequence length.
 
 ### 2.1 Formal Definition
 
@@ -120,7 +120,7 @@ This formulation reveals that savings grow quadratically with pattern utility $(
 
 ## 3. Algorithmic Architecture
 
-Small's compression pipeline consists of five sequential stages, each with well-defined computational complexity.
+Delta's compression pipeline consists of five sequential stages, each with well-defined computational complexity.
 
 ### 3.1 Stage 1: Pattern Discovery
 
@@ -636,9 +636,9 @@ Any measurable compression provides net economic benefit.
 
 ---
 
-## 9. Why We Open-Sourced Small
+## 9. Why We Open-Sourced Delta
 
-The decision to release Small as open-source software reflects our perspective on infrastructure-level tooling and the current state of AI deployment economics.
+The decision to release Delta as open-source software reflects our perspective on infrastructure-level tooling and the current state of AI deployment economics.
 
 ### 9.1 The Inference Cost Bottleneck
 
@@ -648,21 +648,21 @@ The constraint is particularly acute for agentic workflows, where context window
 
 ### 9.2 Why Not Keep It Proprietary?
 
-We considered offering Small as a paid service. The decision against this came down to several factors:
+We considered offering Delta as a paid service. The decision against this came down to several factors:
 
 **Deployment topology.** Compression must occur before tokens reach the inference API. This means the compressor sits in the critical path of every request. Adding a network hop to a third-party service introduces latency, creates a single point of failure, and raises data handling concerns for sensitive workloads. The right deployment model is client-side, which favors open distribution.
 
 **Adoption dynamics.** Compression utilities are most valuable when widely adopted. If compression becomes a standard preprocessing step, model providers can optimize for compressed inputs, tokenizers can account for dictionary formats, and the entire ecosystem benefits. Proprietary tooling fragments this potential.
 
-**Competitive moat.** The algorithms underlying Small are not novel—suffix arrays, weighted interval scheduling, and dictionary compression are well-established techniques. Our value-add is a production-quality implementation with comprehensive configuration, robust error handling, and multi-platform support. This is difficult to sustain as a proprietary advantage.
+**Competitive moat.** The algorithms underlying Delta are not novel—suffix arrays, weighted interval scheduling, and dictionary compression are well-established techniques. Our value-add is a production-quality implementation with comprehensive configuration, robust error handling, and multi-platform support. This is difficult to sustain as a proprietary advantage.
 
-**Strategic alignment.** Triage's core business is AI observability and security tooling. Reducing inference costs for the broader ecosystem expands the addressable market for our primary products. Small is infrastructure that benefits everyone building AI systems, including our customers.
+**Strategic alignment.** Triage's core business is AI observability and security tooling. Reducing inference costs for the broader ecosystem expands the addressable market for our primary products. Delta is infrastructure that benefits everyone building AI systems, including our customers.
 
 ### 9.3 The Ecosystem Benefit
 
 We believe that inference cost reduction should not be a competitive differentiator—it should be table stakes. Every team deploying LLMs faces the same redundancy problem. The solution is architectural, not proprietary.
 
-By releasing Small openly, we aim to:
+By releasing Delta openly, we aim to:
 
 1. **Lower barriers to AI adoption.** Teams with limited budgets can deploy more capable systems.
 2. **Enable architectural experimentation.** Reduced inference costs make longer context windows, deeper RAG retrieval, and more autonomous agents economically viable.
@@ -671,17 +671,17 @@ By releasing Small openly, we aim to:
 
 ### 9.4 Sustainability Model
 
-Open-source does not mean unsupported. We maintain Small as part of our broader infrastructure investment and welcome contributions from the community. Enterprise support, custom integrations, and compression-aware observability are available through Triage's commercial offerings.
+Open-source does not mean unsupported. We maintain Delta as part of our broader infrastructure investment and welcome contributions from the community. Enterprise support, custom integrations, and compression-aware observability are available through Triage's commercial offerings.
 
 ---
 
 ## 10. Conclusion
 
-Small provides a mathematically grounded, production-ready approach to reducing LLM inference costs through lossless token compression. The system achieves 30-60% compression on structured inputs while guaranteeing perfect reconstruction, with sub-50ms latency for typical context windows.
+Delta provides a mathematically grounded, production-ready approach to reducing LLM inference costs through lossless token compression. The system achieves 30-60% compression on structured inputs while guaranteeing perfect reconstruction, with sub-50ms latency for typical context windows.
 
 The core insight is simple: context-augmented generation produces redundant token sequences, and this redundancy can be systematically eliminated at the compression layer without semantic loss. The implementation details—suffix array discovery, weighted interval scheduling, hierarchical compression, and cross-document caching—are engineering refinements on this fundamental observation.
 
-We release Small as open-source software because we believe infrastructure-level cost reduction benefits the entire AI ecosystem. Inference cost should not be a barrier to building capable AI systems.
+We release Delta as open-source software because we believe infrastructure-level cost reduction benefits the entire AI ecosystem. Inference cost should not be a barrier to building capable AI systems.
 
 ---
 
@@ -748,6 +748,6 @@ patch_entry := "<Idx:" integer ">" token
 
 ---
 
-*Small is available under the MIT License at [github.com/delta-ltsc/delta](https://github.com/delta-ltsc/delta).*
+*Delta is available under the MIT License at [github.com/delta-ltsc/delta](https://github.com/delta-ltsc/delta).*
 
 *PyPI: [theta-ltsc](https://pypi.org/project/theta-ltsc/) | npm: [@theta-ltsc/sdk](https://www.npmjs.com/package/@theta-ltsc/sdk)*

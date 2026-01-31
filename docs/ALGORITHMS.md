@@ -1,10 +1,10 @@
 # Algorithm Details
 
-This document describes the core algorithms used in Small for pattern discovery, selection, and compression.
+This document describes the core algorithms used in Delta for pattern discovery, selection, and compression.
 
 ## Overview
 
-Small's compression pipeline consists of three main algorithmic phases:
+Delta's compression pipeline consists of three main algorithmic phases:
 
 1. **Discovery**: Find repeated subsequences in the input
 2. **Selection**: Choose non-overlapping occurrences that maximize savings

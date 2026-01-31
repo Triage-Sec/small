@@ -1,5 +1,5 @@
 /**
- * Core type definitions for Small LTSC SDK.
+ * Core type definitions for Delta LTSC SDK.
  */
 
 /**

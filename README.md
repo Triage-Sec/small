@@ -237,7 +237,7 @@ if prediction.recommendation == "compress":
 
 ### MCP Integration (AI Assistants)
 
-Small provides an MCP server for integration with AI coding assistants:
+Delta provides an MCP server for integration with AI coding assistants:
 
 ```bash
 # Install with MCP support

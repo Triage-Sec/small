@@ -1,6 +1,6 @@
-//! Small LTSC Core - Lossless Token Sequence Compression
+//! Delta LTSC Core - Lossless Token Sequence Compression
 //!
-//! This is the WebAssembly core for the Small LTSC compression library.
+//! This is the WebAssembly core for the Delta LTSC compression library.
 //! It provides high-performance compression and decompression of token sequences
 //! using suffix array-based pattern discovery and optimal selection algorithms.
 //!

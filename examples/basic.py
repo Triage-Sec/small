@@ -1,4 +1,4 @@
-"""Basic usage example for Small compression."""
+"""Basic usage example for Delta compression."""
 
 from delta import compress, decompress, CompressionConfig
 

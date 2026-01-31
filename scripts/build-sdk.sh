@@ -9,7 +9,7 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 ROOT_DIR="$(dirname "$SCRIPT_DIR")"
 SDK_DIR="$ROOT_DIR/packages/sdk"
 
-echo "Building Small LTSC SDK..."
+echo "Building Delta LTSC SDK..."
 echo "SDK dir: $SDK_DIR"
 
 cd "$SDK_DIR"

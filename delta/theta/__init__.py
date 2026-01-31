@@ -1,6 +1,6 @@
-"""Small: Lossless Token Sequence Compression for Large Language Models.
+"""Delta: Lossless Token Sequence Compression for Large Language Models.
 
-Small is a research-grade lossless token sequence compression system designed
+Delta is a research-grade lossless token sequence compression system designed
 to reduce the computational and economic cost of LLM inference by eliminating
 redundancy in input sequences before they reach the model.
 

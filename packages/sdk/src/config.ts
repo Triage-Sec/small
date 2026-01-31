@@ -1,5 +1,5 @@
 /**
- * TypeScript configuration types for Small LTSC.
+ * TypeScript configuration types for Delta LTSC.
  */
 
 import type { StaticDictionary } from './dictionaries/index.js';

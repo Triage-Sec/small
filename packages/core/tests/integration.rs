@@ -1,4 +1,4 @@
-//! Integration tests for Small LTSC Core.
+//! Integration tests for Delta LTSC Core.
 //!
 //! These tests verify the complete compression pipeline works correctly.
 
